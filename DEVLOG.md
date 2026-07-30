@@ -27,3 +27,12 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Traducidos los 6 modelos del diagrama entidad-relación a `schema.prisma`, con relaciones completas, tipos `Decimal` para dinero, y `@map`/`@@map` para mantener las columnas de PostgreSQL en snake_case mientras el código usa camelCase.
 - Añadidas restricciones `@unique` adicionales: nombre de artículo (evita duplicados en el catálogo) y hash de factura (red de seguridad de integridad).
 - Primera migración (`20260730114009_init`) aplicada correctamente: las 6 tablas existen en PostgreSQL, con claves foráneas protegidas (`ON DELETE RESTRICT`, para no poder borrar registros con facturas asociadas).
+
+
+## 2026-07-30 — Fase 3 (en progreso): autenticación — hashing y seed de empleados
+
+- Instaladas dependencias de autenticación: `bcryptjs` (hashing de contraseñas; se usa en vez de `bcrypt` para evitar problemas de compilación nativa en Windows) y `express-session`.
+- Descubierto que Prisma 7 requiere un "driver adapter" explícito para conectar con PostgreSQL (`@prisma/adapter-pg` + `pg`), a diferencia de versiones anteriores donde bastaba `new PrismaClient()`.
+- Creado `prisma/seed.ts`: da de alta a Fernando y David en `empleados`, con sus contraseñas ya hasheadas (nunca en texto plano). Ejecutado correctamente contra la base de datos real.
+- Decisión de privacidad: `prisma/seed.ts` contiene datos reales (DNI, dirección fiscal) y se ha añadido a `.gitignore` — nunca se sube al repositorio público. Se versiona en su lugar `prisma/seed.example.ts` (datos ficticios) y `.env.example` (plantilla sin credenciales reales), siguiendo el mismo patrón que `.env`.
+- Pendiente para la próxima sesión: endpoint de login, gestión de sesiones, y protección de rutas.
