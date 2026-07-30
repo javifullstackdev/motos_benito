@@ -18,3 +18,12 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Decisiones de diseño: direcciones aplanadas (1FN), snapshot de precio e IVA en cada línea de factura, campos de dinero como `decimal`.
 - Pendiente: domicilio fiscal real de Fernando y David (de momento con datos de ejemplo).
 - Diagrama entidad-relación documentado en `docs/modelo-datos.md`.
+
+
+## 2026-07-30 — Fase 2: backend base y primera migración
+
+- Servidor Express + TypeScript funcionando, con ruta de comprobación `/api/health`.
+- Prisma 7 configurado con PostgreSQL local (`motos_benito_dev`), usando el nuevo `prisma.config.ts`.
+- Traducidos los 6 modelos del diagrama entidad-relación a `schema.prisma`, con relaciones completas, tipos `Decimal` para dinero, y `@map`/`@@map` para mantener las columnas de PostgreSQL en snake_case mientras el código usa camelCase.
+- Añadidas restricciones `@unique` adicionales: nombre de artículo (evita duplicados en el catálogo) y hash de factura (red de seguridad de integridad).
+- Primera migración (`20260730114009_init`) aplicada correctamente: las 6 tablas existen en PostgreSQL, con claves foráneas protegidas (`ON DELETE RESTRICT`, para no poder borrar registros con facturas asociadas).

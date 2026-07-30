@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Taller {
+  tallerId  Int @id @default(autoincrement()) @map("taller_id")
+  nombreTaller String @unique @map("nombre_taller")
+  dirTaller String @map("dir_taller")
+  telTaller String @map("tel_taller")
+  emailTaller  String @map("email_taller")
+  facturas Factura[]
+
+  @@map("talleres")
+}
+
+model Empleado {
+  emplId  Int  @id @default(autoincrement()) @map("empl_id")
+  nombreEmpl String  @map("nombre_empl")
+  apellido1Empl  String @map("apellido1_empl")
+  apellido2Empl  String  @map("apellido2_empl")
+  dniEmpl  String @unique @map("dni_empl")
+  emailEmpl  String @unique @map("email_empl")
+  passwordEmpl String @map("password_empl")
+  tipoViaEmpl  String @map("tipo_via_empl")
+  nombreViaEmpl  String @map("nombre_via_empl")
+  numViaEmpl  String  @map("num_via_empl")
+  localidadEmpl String  @map("localidad_empl")
+  provinciaEmpl String  @map("provincia_empl")
+  cpEmpl  String  @map("cp_empl")
+  paisEmpl String @map("pais_empl")
+  activoEmpl Boolean @map("activo_empl")
+  facturas Factura[]
+
+  @@map("empleados")
+}
+
+model Cliente {
+  clienteId  Int @id @default(autoincrement())  @map("cliente_id")
+  tipoCliente  String @map("tipo_cliente")
+  idFiscalCliente String @unique  @map("id_fiscal_cliente")
+  nombreCliente  String @map("nombre_cliente")
+  telCliente  String  @map("tel_cliente")
+  emailCliente String @map("email_cliente")
+  tipoViaCliente  String  @map("tipo_via_cliente")
+  nombreViaCliente  String  @map("nombre_via_cliente")
+  numViaCliente  String @map("num_via_cliente")
+  localidadCliente String @map("localidad_cliente")
+  provinciaCliente String @map("provincia_cliente")
+  cpCliente  String @map("cp_cliente")
+  paisCliente  String @map("pais_cliente")
+  facturas Factura[]
+
+  @@map("clientes")
+}
+
+model Articulo {
+  articuloId Int @id @default(autoincrement())  @map("articulo_id")
+  nombreArticulo String @unique @map("nombre_articulo")
+  precioUnitArticulo  Decimal @db.Decimal(10,2) @map("precio_unit_articulo")
+  stockArticulo  Boolean  @map("stock_articulo")
+  lineasFactura LineaFactura[]
+
+  @@map("articulos")
+}
+
+model Factura {
+  facturaId  Int @id @default(autoincrement())  @map("factura_id")
+  numFactura String @unique @map("num_factura")
+  tallerId Int  @map("taller_id")
+  emplId Int  @map("empl_id")
+  clienteId  Int  @map("cliente_id")
+  fechaEmision DateTime  @default(now()) @map("fecha_emision")
+  subtotal  Decimal @db.Decimal(10,2)
+  ivaPorcentaje  Decimal @db.Decimal(10,2)  @map("iva_porcentaje")
+  ivaTotal Decimal @db.Decimal(10,2)  @map("iva_total")
+  total Decimal @db.Decimal(10,2)
+  hashActual String @unique @map("hash_actual")
+  hashAnterior String @map("hash_anterior")
+  estado  String
+  factRectId  Int?  @map("fact_rect_id")
+  taller Taller @relation(fields: [tallerId], references: [tallerId])
+  empleado Empleado @relation(fields: [emplId], references: [emplId])
+  cliente Cliente @relation(fields: [clienteId], references: [clienteId])
+  lineasFactura LineaFactura[]
+
+  @@map("facturas")
+}
+
+model LineaFactura {
+  lineaId  Int @id @default(autoincrement())  @map("linea_id")
+  facturaId Int  @map("factura_id")
+  articuloId Int  @map("articulo_id")
+  descripcion String
+  cantidad  Int
+  precioUnit Decimal @db.Decimal(10,2)  @map("precio_unit")
+  subtotalLinea  Decimal @db.Decimal(10,2)  @map("subtotal_linea")
+  factura Factura @relation(fields: [facturaId], references: [facturaId])
+  articulo Articulo @relation(fields: [articuloId], references: [articuloId])
+
+  @@map("lineas_facturas")
+}

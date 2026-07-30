@@ -16,72 +16,72 @@ erDiagram
     TALLERES ||--o{ FACTURAS
     TALLERES {
         int taller_id PK
-        string nombre
-        string direccion
-        string telefono
-        string email
+        string nombre_taller
+        string dir_taller
+        string tel_taller
+        string email_taller
     }
 
     EMPLEADOS ||--o{ FACTURAS : "emite"
     EMPLEADOS {
         int empleado_id PK
         string nombre
-        string apellido1
-        string apellido2
-        string dni
-        string email
-        string password
-        string tipo_via_fiscal
-        string nombre_via_fiscal
-        string numero_via_fiscal
-        string localidad_fiscal
-        string provincia_fiscal
-        int cp_fiscal
-        string pais_fiscal
-        boolean activo
+        string apellido1_empl
+        string apellido2_empl
+        string dni_empl
+        string email_empl
+        string password_empl
+        string tipo_via_empl
+        string nombre_via_empl
+        string num_via_empl
+        string localidad_empl
+        string provincia_empl
+        string cp_empl
+        string pais_empl
+        boolean activo_empl
     }
 
     CLIENTES ||--o{ FACTURAS
     CLIENTES {
         int cliente_id PK
         string tipo_cliente
-        string identificador_fiscal
-        string nombre
-        string telefono
-        string email
-        string direccion_tipo_via
-        string direccion_nombre_via
-        string direccion_numero
-        string direccion_localidad
-        string direccion_provincia
-        int direccion_cp
-        string direccion_pais
+        string id_fiscal_cliente
+        string nombre_cliente
+        string tel_cliente
+        string email_cliente
+        string tipo_via_cliente
+        string nombre_via_cliente
+        string num_via_cliente
+        string localidad_cliente
+        string provincia_cliente
+        string cp_cliente
+        string pais_cliente
     }
 
     ARTICULOS ||--o{ LINEAS_FACTURA
     ARTICULOS {
         int articulo_id PK
-        string nombre
-        decimal precio_unitario
-        boolean stock
+        string nombre_articulo
+        decimal precio_unit_articulo
+        boolean stock_articulo
     }
 
     FACTURAS ||--o{ LINEAS_FACTURA
     FACTURAS {
         int factura_id PK
-        string numero_factura
+        string num_factura
         int taller_id FK
-        int empleado_id FK
+        int empl_id FK
         int cliente_id FK
         string fecha_emision
         decimal subtotal
-        int iva_porcentaje
+        decimal iva_porcentaje
         decimal iva_total
         decimal total
         string hash_actual
         string hash_anterior
         string estado
-        int factura_rectificada_id
+        int fact_rect_id
     }
 
     LINEAS_FACTURA {
@@ -90,7 +90,7 @@ erDiagram
         int articulo_id FK
         string descripcion
         int cantidad
-        decimal precio_unitario
+        decimal precio_unit
         decimal subtotal_linea
     }
 ```
