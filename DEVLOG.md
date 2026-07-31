@@ -36,3 +36,13 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Creado `prisma/seed.ts`: da de alta a Fernando y David en `empleados`, con sus contraseñas ya hasheadas (nunca en texto plano). Ejecutado correctamente contra la base de datos real.
 - Decisión de privacidad: `prisma/seed.ts` contiene datos reales (DNI, dirección fiscal) y se ha añadido a `.gitignore` — nunca se sube al repositorio público. Se versiona en su lugar `prisma/seed.example.ts` (datos ficticios) y `.env.example` (plantilla sin credenciales reales), siguiendo el mismo patrón que `.env`.
 - Pendiente para la próxima sesión: endpoint de login, gestión de sesiones, y protección de rutas.
+
+
+## 2026-07-30 — Fase 3 completada: autenticación de empleados
+
+- Endpoint `POST /api/auth/login`: verifica email + contraseña (comparación con bcrypt, nunca en texto plano); mismo mensaje y código 401 tanto si el usuario no existe como si la contraseña es incorrecta, para no filtrar qué emails están registrados.
+- Endpoint `POST /api/auth/logout`: destruye la sesión del servidor.
+- Endpoint `GET /api/auth/me`: devuelve los datos del empleado autenticado, usando `select` de Prisma para excluir explícitamente la contraseña de la respuesta.
+- Middleware `requireAuth` reutilizable (`src/middleware/requireAuth.ts`), listo para proteger cualquier ruta futura (clientes, artículos, facturas).
+- Sesiones gestionadas con `express-session` (cookie firmada, caduca a las 8 horas).
+- Probado el flujo completo de principio a fin: login → `/me` autenticado → logout → `/me` tras logout devuelve 401 correctamente.

@@ -1,9 +1,32 @@
 import express from "express";
 import "dotenv/config";
+import session from "express-session";
+import authRoutes from "./routes/auth";
 
 const app = express();
 
 const port = process.env.PORT ?? 3000;
+
+app.use(express.json());
+
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET ?? "dev-secret-change-me",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 8, // 8 hours
+        },
+    })
+);
+
+app.use("/api/auth", authRoutes);
+
+declare module "express-session" {
+    interface SessionData {
+        emplId?: number;
+    }
+}
 
 app.get("/", (req, res) => {
     res.send("Hello World");
