@@ -2,6 +2,9 @@ import express from "express";
 import "dotenv/config";
 import session from "express-session";
 import authRoutes from "./routes/auth";
+import clientesRoutes from "./routes/clientes";
+import articulosRoutes from "./routes/articulos";
+
 
 const app = express();
 
@@ -21,6 +24,8 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
+app.use("/api/clientes", clientesRoutes);
+app.use("/api/articulos", articulosRoutes);
 
 declare module "express-session" {
     interface SessionData {

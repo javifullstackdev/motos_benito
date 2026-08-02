@@ -46,3 +46,12 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Middleware `requireAuth` reutilizable (`src/middleware/requireAuth.ts`), listo para proteger cualquier ruta futura (clientes, artículos, facturas).
 - Sesiones gestionadas con `express-session` (cookie firmada, caduca a las 8 horas).
 - Probado el flujo completo de principio a fin: login → `/me` autenticado → logout → `/me` tras logout devuelve 401 correctamente.
+
+
+## 2026-08-02 — Fase 4 completada: CRUD de clientes y artículos
+
+- Endpoints REST completos (listar, obtener por id, crear, actualizar, borrar) para `clientes` y `articulos`, montados en `/api/clientes` y `/api/articulos`, protegidos con el middleware `requireAuth`.
+- Cada recurso vive en su propio archivo (`src/routes/clientes.ts`, `src/routes/articulos.ts`), usando `Router` de Express para mantener el código organizado.
+- Manejo de errores con `try/catch` en `update`/`delete`, capturando tanto registros no encontrados como violaciones de las restricciones `ON DELETE RESTRICT` (por ejemplo, no se puede borrar un artículo ya usado en alguna línea de factura).
+- Probado el flujo completo (crear → listar → obtener → actualizar → borrar → confirmar borrado) para ambos recursos, con datos de prueba ficticios.
+- Estos endpoints son la base sobre la que se construirá el autorelleno del formulario de facturas en el frontend (Fase 8).
