@@ -63,3 +63,14 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Base de datos reseteada y migrada desde cero con el esquema en inglés (`prisma migrate reset` + `prisma migrate dev --name init`), y datos de Fernando y David resembrados.
 - Verificado el flujo completo tras la renombrada: login, `/api/customers`, `/api/items` funcionando correctamente.
 - `src/routes/invoices.ts` sigue en construcción (Fase 5) — el cálculo del número de factura con reintento transaccional ya está traducido y corregido; pendiente el cálculo del hash y la creación real de la factura.
+
+
+## 2026-08-02 — Fase 5 completada: núcleo de facturación
+
+- Endpoint `POST /api/invoices`: crea una factura con sus líneas, calculando `subtotal`, `taxAmount` (21%) y `total` con aritmética `Decimal` exacta (nunca `float`).
+- Numeración de factura correlativa **por empleado** (`INICIALES-AÑO-NNNN`, ej. `FMV-2026-0001`), calculada dentro de una transacción con aislamiento `Serializable` y reintento automático ante conflictos de escritura (`P2034`) — protege contra condiciones de carrera si dos facturas se crean casi a la vez.
+- Cadena de hash (SHA-256) por empleado: cada factura encadena su hash con el de la anterior, verificado manualmente en PostgreSQL — el `current_hash` de la primera coincide exactamente con el `previous_hash` de la segunda.
+- Cada línea de factura congela el nombre y precio del artículo en el momento de facturar (snapshot), no una referencia en vivo.
+- Añadidos los 2 talleres (Colmenar de Oreja, Aranjuez) al `seed.ts`, con datos pendientes de confirmar por el cliente real.
+- Probado de principio a fin: login → crear cliente y artículo de prueba → crear 2 facturas consecutivas → verificar en PostgreSQL que la cadena de hash es correcta.
+- Pendiente para más adelante: flujo de facturas rectificativas (correcciones), que usará la autorreferencia `correctedInvoiceId` que dejamos preparada en el esquema pero sin implementar todavía.

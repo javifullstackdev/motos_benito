@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma";
+import { Prisma } from "../generated/prisma/client";
 import { requireAuth } from "../middleware/requireAuth";
+import crypto from "crypto";
 
 const router = Router();
 
@@ -10,7 +12,17 @@ function calculateInitials(firstName: string, lastName1: string, lastName2: stri
     return (firstName[0] + lastName1[0] + lastName2[0]).toUpperCase();
 }
 
-async function createInvoiceWithRetry(employee: any, maxAttempts = 5) {
+function calculateHash(previousHash: string, data: string): string {
+    return crypto.createHash("sha256").update(previousHash + data).digest("hex");
+}
+
+async function createInvoiceWithRetry(
+    employee: any,
+    workshopId: number,
+    customerId: number,
+    lines: { itemId: number; description: string; unitPrice: Prisma.Decimal; quantity: number }[],
+    maxAttempts = 5
+) {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         try {
             return await prisma.$transaction(
@@ -35,6 +47,54 @@ async function createInvoiceWithRetry(employee: any, maxAttempts = 5) {
                     
                     const invoiceNumber = `${prefix}${String(nextNumber).padStart(4, "0")}`;
 
+                    const previousHash = lastInvoice?.currentHash ?? "";
+
+                    const lineSubtotals = lines.map((line) => ({
+                        ...line,
+                        lineSubtotal: line.unitPrice.mul(line.quantity),
+                    }));
+
+                    const subtotal = lineSubtotals.reduce(
+                        (acc, line) => acc.plus(line.lineSubtotal),
+                        new Prisma.Decimal(0),
+                    );
+
+                    const taxRate = new Prisma.Decimal(21);
+                    const taxAmount = subtotal.times(taxRate).dividedBy(100);
+                    const total = subtotal.plus(taxAmount);
+
+                    const dataToHash = `${employee.nationalId}-${invoiceNumber}-${total.toString()}`;
+                    const currentHash = calculateHash(previousHash, dataToHash);
+
+                    const invoice = await tsx.invoice.create({
+                        data: {
+                            invoiceNumber,
+                            workshopId,
+                            emplId: employee.emplId,
+                            customerId,
+                            subtotal,
+                            taxRate,
+                            taxAmount,
+                            total,
+                            currentHash,
+                            previousHash,
+                            status: "issued",
+                            invoiceLines: {
+                                create: lineSubtotals.map((line) => ({
+                                    itemId: line.itemId,
+                                    description: line.description,
+                                    unitPrice: line.unitPrice,
+                                    quantity: line.quantity,
+                                    lineSubtotal: line.lineSubtotal,
+                                })),
+                            }
+                        },
+                        include: {
+                            invoiceLines: true,
+                        },
+                    });
+
+                    return invoice;
                 },
                 { isolationLevel: "Serializable"}
             );
@@ -46,5 +106,33 @@ async function createInvoiceWithRetry(employee: any, maxAttempts = 5) {
         }
     }
 }
+
+router.post("/", async (req, res) => {
+    const emplId = req.session.emplId!;
+    const employee = await prisma.employee.findUnique({
+        where: { emplId }
+    });
+
+    const { workshopId, customerId, lines } = req.body;
+
+    const itemsIds = lines.map((line : any) => line.itemId);
+    const items = await prisma.item.findMany({
+        where: { itemId: { in: itemsIds } },
+    });
+
+    const resolvedLines = lines.map((line : any) => {
+        const item = items.find((i) => i.itemId === line.itemId);
+        return {
+            itemId: line.itemId,
+            description: item!.name,
+            unitPrice: item!.unitPrice,
+            quantity: line.quantity,
+        };
+    });
+
+    const invoice = await createInvoiceWithRetry(employee, workshopId, customerId, resolvedLines);
+
+    res.status(201).json({ invoice });
+});
 
 export default router;
