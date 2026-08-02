@@ -7,37 +7,37 @@ const router = Router();
 router.use(requireAuth);
 
 router.get("/", async (req, res) => {
-    const clientes = await prisma.cliente.findMany();
-    res.json({ clientes });
+    const customers = await prisma.customer.findMany();
+    res.json({ customers });
 });
 
 router.get("/:id", async (req, res) => {
     const { id } = req.params;
-    const cliente = await prisma.cliente.findUnique({ where: { clienteId: parseInt(id) } });
-    if (!cliente) {
+    const customer = await prisma.customer.findUnique({ where: { customerId: parseInt(id) } });
+    if (!customer) {
         return res.status(404).json({ error: "Cliente no encontrado" });
     }
-    res.json( { cliente });
+    res.json( { customer });
 });
 
 router.post("/", async (req, res) => {
-    const cliente = await prisma.cliente.create({ data: req.body });
-    res.status(201).json({ cliente });
+    const customer = await prisma.customer.create({ data: req.body });
+    res.status(201).json({ customer });
 });
 
 router.put("/:id", async (req, res) => {
     const id = Number(req.params.id);
-    const cliente = await prisma.cliente.update({ 
-        where: { clienteId: id }, 
+    const customer = await prisma.customer.update({ 
+        where: { customerId: id }, 
         data: req.body 
     });
-    res.json({ cliente });
+    res.json({ customer });
 });
 
 router.delete("/:id", async (req, res) => {
     const id  = Number(req.params.id);
     try {
-        await prisma.cliente.delete({ where: { clienteId: id } });
+        await prisma.customer.delete({ where: { customerId: id } });
         res.json({ message: "Cliente eliminado correctamente" });
     } catch (error) {
         res.status(409).json({ error: "Error al eliminar el cliente, este tiene facturas asociadas" });

@@ -8,22 +8,22 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
     const hashedPassword = await bcrypt.hash("1234.Abcd*", 10);
 
-    await prisma.empleado.create({
+    await prisma.employee.create({
         data: {
-            nombreEmpl: "Nombre",
-            apellido1Empl: "Apellido1",
-            apellido2Empl: "Apellido2",
-            dniEmpl: "00000000A",
-            emailEmpl: "empleado1@motosbenito.com",
-            passwordEmpl: hashedPassword,
-            tipoViaEmpl: "Calle",
-            nombreViaEmpl: "Nombre de la calle",
-            numViaEmpl: "1",
-            localidadEmpl: "Localidad",
-            provinciaEmpl: "Provincia",
-            cpEmpl: "00000",
-            paisEmpl: "España",
-            activoEmpl: true,
+            firstName: "Nombre",
+            lastName1: "Apellido1",
+            lastName2: "Apellido2",
+            nationalId: "00000000A",
+            email: "empleado1@motosbenito.com",
+            password: hashedPassword,
+            streetType: "Calle",
+            streetName: "Nombre de la calle",
+            streetNumber: "1",
+            city: "Localidad",
+            province: "Provincia",
+            postalCode: "00000",
+            country: "España",
+            active: true,
         },
     });
 }

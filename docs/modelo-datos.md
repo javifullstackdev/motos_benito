@@ -4,93 +4,93 @@ Diagrama entidad-relación del núcleo de facturación: talleres, empleados, cli
 
 ## Decisiones clave
 
-- La numeración de factura (`numero_factura`) y el encadenado de hash (Veri*Factu) son independientes **por empleado**, ya que Fernando y David son autónomos distintos, sin CIF de empresa conjunta — cada uno tributa de forma independiente ante Hacienda.
-- Cada línea de factura guarda una copia congelada (*snapshot*) del nombre, precio unitario e IVA vigentes en el momento de facturar, en lugar de leerlos en vivo desde `articulos`. Así, si cambia el precio de un artículo o el % de IVA legal en el futuro, las facturas ya emitidas no se ven alteradas retroactivamente.
-- `talleres` no tiene identidad fiscal propia — son solo los dos puntos físicos donde se presta el servicio (Aranjuez y Colmenar de Oreja). El dato fiscal (DNI, domicilio fiscal) vive en `empleados`, porque es quien legalmente emite cada factura.
+- La numeración de factura (`invoice_number`) y el encadenado de hash (Veri*Factu) son independientes **por empleado**, ya que Fernando y David son autónomos distintos, sin CIF de empresa conjunta — cada uno tributa de forma independiente ante Hacienda.
+- Cada línea de factura guarda una copia congelada (*snapshot*) del nombre, precio unitario e IVA vigentes en el momento de facturar, en lugar de leerlos en vivo desde `items`. Así, si cambia el precio de un artículo o el % de IVA legal en el futuro, las facturas ya emitidas no se ven alteradas retroactivamente.
+- `workshops` no tiene identidad fiscal propia — son solo los dos puntos físicos donde se presta el servicio (Aranjuez y Colmenar de Oreja). El dato fiscal (DNI, domicilio fiscal) vive en `employees`, porque es quien legalmente emite cada factura.
 - Los campos monetarios usan `decimal`, no `float`/`double`, para evitar errores de redondeo en importes reales.
 
 ## Diagrama
 
 ```mermaid
 erDiagram
-    TALLERES ||--o{ FACTURAS
-    TALLERES {
-        int taller_id PK
-        string nombre_taller
-        string dir_taller
-        string tel_taller
-        string email_taller
+    WORKSHOPS ||--o{ INVOICES
+    WORKSHOPS {
+        int workshop_id PK
+        string name
+        string address
+        string phone
+        string email
     }
 
-    EMPLEADOS ||--o{ FACTURAS : "emite"
-    EMPLEADOS {
-        int empleado_id PK
-        string nombre
-        string apellido1_empl
-        string apellido2_empl
-        string dni_empl
-        string email_empl
-        string password_empl
-        string tipo_via_empl
-        string nombre_via_empl
-        string num_via_empl
-        string localidad_empl
-        string provincia_empl
-        string cp_empl
-        string pais_empl
-        boolean activo_empl
+    EMPLOYEES ||--o{ INVOICES : "emite"
+    EMPLOYEES {
+        int empl_id PK
+        string name
+        string last_name_1
+        string last_name_2
+        string national_id
+        string email
+        string password
+        string street_type
+        string street_name
+        string street_number
+        string city
+        string province
+        string postal_code
+        string country
+        boolean active
     }
 
-    CLIENTES ||--o{ FACTURAS
-    CLIENTES {
-        int cliente_id PK
-        string tipo_cliente
-        string id_fiscal_cliente
-        string nombre_cliente
-        string tel_cliente
-        string email_cliente
-        string tipo_via_cliente
-        string nombre_via_cliente
-        string num_via_cliente
-        string localidad_cliente
-        string provincia_cliente
-        string cp_cliente
-        string pais_cliente
+    CUSTOMERS ||--o{ INVOICES
+    CUSTOMERS {
+        int customer_id PK
+        string type
+        string tax_id
+        string name
+        string phone
+        string email
+        string street_type
+        string street_name
+        string street_number
+        string city
+        string province
+        string postal_code
+        string country
     }
 
-    ARTICULOS ||--o{ LINEAS_FACTURA
-    ARTICULOS {
-        int articulo_id PK
-        string nombre_articulo
-        decimal precio_unit_articulo
-        boolean stock_articulo
+    ITEMS ||--o{ INVOICE_LINES
+    ITEMS {
+        int item_id PK
+        string name
+        decimal unit_price
+        boolean in_stock
     }
 
-    FACTURAS ||--o{ LINEAS_FACTURA
-    FACTURAS {
-        int factura_id PK
-        string num_factura
-        int taller_id FK
+    INVOICES ||--o{ INVOICE_LINES
+    INVOICES {
+        int invoice_id PK
+        string invoice_number
+        int workshop_id FK
         int empl_id FK
-        int cliente_id FK
-        string fecha_emision
+        int customer_id FK
+        string issue_date
         decimal subtotal
-        decimal iva_porcentaje
-        decimal iva_total
+        decimal tax_rate
+        decimal tax_amount
         decimal total
-        string hash_actual
-        string hash_anterior
-        string estado
-        int fact_rect_id
+        string current_hash
+        string previous_hash
+        string status
+        int corrected_invoice_id
     }
 
-    LINEAS_FACTURA {
-        int linea_id PK
-        int factura_id FK
-        int articulo_id FK
-        string descripcion
-        int cantidad
-        decimal precio_unit
-        decimal subtotal_linea
+    INVOICE_LINES {
+        int invoice_line_id PK
+        int invoice_id FK
+        int item_id FK
+        string description
+        int quantity
+        decimal unit_price
+        decimal line_subtotal
     }
 ```

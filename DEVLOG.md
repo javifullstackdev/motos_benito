@@ -55,3 +55,11 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Manejo de errores con `try/catch` en `update`/`delete`, capturando tanto registros no encontrados como violaciones de las restricciones `ON DELETE RESTRICT` (por ejemplo, no se puede borrar un artículo ya usado en alguna línea de factura).
 - Probado el flujo completo (crear → listar → obtener → actualizar → borrar → confirmar borrado) para ambos recursos, con datos de prueba ficticios.
 - Estos endpoints son la base sobre la que se construirá el autorelleno del formulario de facturas en el frontend (Fase 8).
+
+
+## 2026-08-02 — Renombrado completo del código a inglés
+
+- Todo el proyecto (esquema de Prisma, rutas, seeds, documentación) traducido del español al inglés para una imagen más profesional en el portfolio: `Taller→Workshop`, `Empleado→Employee`, `Cliente→Customer`, `Articulo→Item`, `Factura→Invoice`, `LineaFactura→InvoiceLine`.
+- Base de datos reseteada y migrada desde cero con el esquema en inglés (`prisma migrate reset` + `prisma migrate dev --name init`), y datos de Fernando y David resembrados.
+- Verificado el flujo completo tras la renombrada: login, `/api/customers`, `/api/items` funcionando correctamente.
+- `src/routes/invoices.ts` sigue en construcción (Fase 5) — el cálculo del número de factura con reintento transaccional ya está traducido y corregido; pendiente el cálculo del hash y la creación real de la factura.

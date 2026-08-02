@@ -7,20 +7,20 @@ const router = Router();
 
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
-    const user = await prisma.empleado.findUnique({
-        where: { emailEmpl: email },
+    const user = await prisma.employee.findUnique({
+        where: { email: email },
     });
     if (!user) {
         return res.status(401).json({ error: "Usuario o contraseña incorrectos" });
     }
 
-    const validPassword = await bcrypt.compare(password, user.passwordEmpl);
+    const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
         return res.status(401).json({ error: "Usuario o contraseña incorrectos" });
     }
 
     req.session.emplId = user.emplId;
-    res.json({ message: "Bienvenido de nuevo, " + user.nombreEmpl });
+    res.json({ message: "Bienvenido de nuevo, " + user.firstName });
 });
 
 router.post("/logout", (req, res) => {
@@ -34,15 +34,15 @@ router.post("/logout", (req, res) => {
 
 router.get("/me", requireAuth, async (req, res) => {
     const emplId = req.session.emplId;
-    const user = await prisma.empleado.findUnique({
+    const user = await prisma.employee.findUnique({
         where: { emplId },
         select: {
             emplId: true,
-            nombreEmpl: true,
-            apellido1Empl: true,
-            apellido2Empl: true,
-            emailEmpl: true,
-            activoEmpl: true,
+            firstName: true,
+            lastName1: true,
+            lastName2: true,
+            email: true,
+            active: true,
         },
     });
     res.json({ user });
