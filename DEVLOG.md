@@ -98,3 +98,11 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Tailwind CSS instalado y configurado mediante su plugin oficial de Vite (`@tailwindcss/vite`) — sin necesidad de archivo de configuración aparte para lo básico.
 - Limpiado el contenido de ejemplo de Vite en `App.tsx`, sustituido por un placeholder mínimo. Verificado que las clases de Tailwind se aplican correctamente (tamaño de letra, negrita y color comprobados en el navegador).
 - Siguiente paso (Fase 8.1): estructura base del frontend y comunicación con la API del backend.
+
+
+## 2026-08-16 — Fase 8.1 completada: estructura base y conexión con la API
+
+- Configurado CORS en el backend (`cors`, con `credentials: true` y origen restringido a `FRONTEND_URL`) para permitir peticiones desde el frontend con la cookie de sesión incluida.
+- Creado `frontend/src/api/client.ts`: función `apiFetch` que envuelve `fetch` con la URL base, `credentials: "include"` y manejo de errores reutilizando el formato `{ error }` del backend.
+- Verificado el circuito completo (CORS + cookies + fetch + estado de React) llamando a `/api/health` desde `App.tsx` con `useState`/`useEffect`.
+- Siguiente paso (Fase 8.2): página de login.
