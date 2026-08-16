@@ -106,3 +106,11 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Creado `frontend/src/api/client.ts`: función `apiFetch` que envuelve `fetch` con la URL base, `credentials: "include"` y manejo de errores reutilizando el formato `{ error }` del backend.
 - Verificado el circuito completo (CORS + cookies + fetch + estado de React) llamando a `/api/health` desde `App.tsx` con `useState`/`useEffect`.
 - Siguiente paso (Fase 8.2): página de login.
+
+
+## 2026-08-16 — Fase 8.2 completada: página de login
+
+- `frontend/src/pages/Login.tsx`: formulario controlado (email + contraseña) que llama a `POST /api/auth/login` mediante `apiFetch`.
+- Manejo de estados: `isLoading` (deshabilita el botón y cambia su texto mientras se envía), `error` (muestra el mensaje del backend si el login falla).
+- Probado con éxito: login correcto con las credenciales de Fernando, y mensaje de error visible con credenciales incorrectas.
+- Pendiente para la Fase 8.3: sistema de rutas (React Router) y protección de páginas privadas — de momento `Login` se muestra directamente en `App.tsx` sin navegación real tras el login.
