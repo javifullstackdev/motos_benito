@@ -74,3 +74,10 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Añadidos los 2 talleres (Colmenar de Oreja, Aranjuez) al `seed.ts`, con datos pendientes de confirmar por el cliente real.
 - Probado de principio a fin: login → crear cliente y artículo de prueba → crear 2 facturas consecutivas → verificar en PostgreSQL que la cadena de hash es correcta.
 - Pendiente para más adelante: flujo de facturas rectificativas (correcciones), que usará la autorreferencia `correctedInvoiceId` que dejamos preparada en el esquema pero sin implementar todavía.
+
+
+## 2026-08-16 — Fase 6 completada: código QR de verificación
+
+- Endpoint `GET /api/invoices/:id/qr`: genera un código QR (imagen en base64) a partir de los datos clave de la factura (NIF del empleado, número, fecha, importe), usando la librería `qrcode`.
+- Probado generando y visualizando el QR en el navegador — funciona correctamente.
+- **Pendiente de validación oficial**: el contenido actual del QR es un texto de ejemplo (`NIF:...|NUM:...|FECHA:...|IMPORTE:...`), no el formato exacto que exige la normativa Veri*Factu. Al escanearlo con la cámara del móvil, dio "contenido no válido" — probablemente porque el formato oficial real es una URL (que las cámaras reconocen de forma nativa), no texto libre. Antes de producción, hay que confirmar el formato exacto con la documentación oficial de la AEAT (o la gestoría) y actualizar `qrContent` en consecuencia — el resto de la implementación no cambiaría.

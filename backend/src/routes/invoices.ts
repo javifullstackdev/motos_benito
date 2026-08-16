@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma";
 import { Prisma } from "../generated/prisma/client";
 import { requireAuth } from "../middleware/requireAuth";
 import crypto from "crypto";
+import QRCode from "qrcode";
 
 const router = Router();
 
@@ -133,6 +134,28 @@ router.post("/", async (req, res) => {
     const invoice = await createInvoiceWithRetry(employee, workshopId, customerId, resolvedLines);
 
     res.status(201).json({ invoice });
+});
+
+router.get("/:id/qr", async (req, res) => {
+
+    const id = Number(req.params.id);
+
+    const invoice = await prisma.invoice.findUnique({
+        where: { invoiceId: id },
+        include: { employee: true },
+    });
+
+    if (!invoice) {
+        return res.status(404).json({ error: "Invoice not found" });
+    }
+
+    const qrContent =
+    `NIF:${invoice.employee.nationalId}|NUM:${invoice.invoiceNumber}|FECHA:${invoice.issueDate}|IMPORTE:${invoice.total}`;
+
+    const qr = await QRCode.toDataURL(qrContent);
+
+    res.json({ qr });
+
 });
 
 export default router;
