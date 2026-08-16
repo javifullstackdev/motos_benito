@@ -124,3 +124,11 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Backend: `POST /api/auth/login` ahora también devuelve los datos del empleado (sin la contraseña), igual que `/me`, para no tener que hacer una segunda petición tras el login.
 - `Login.tsx` actualizado: al iniciar sesión con éxito, actualiza el contexto (`login(data.user)`) y navega al panel protegido (`navigate("/")`).
 - Siguiente paso (Fase 8.4): gestión de clientes (listar, crear) en el frontend.
+
+
+## 2026-08-16 — Fase 8.4 (en progreso): listado de clientes
+
+- `frontend/src/pages/CustomerList.tsx`: pide `GET /api/customers` al montar y dibuja una tabla con nombre, NIF/CIF, teléfono y email de cada cliente.
+- Ruta `/customers` añadida y protegida con `ProtectedRoute`, enlazada desde el panel principal con `<Link>` (navegación sin recargar la página).
+- Corregido un fallo de seguridad real: la ruta `/` había perdido su envoltorio `ProtectedRoute` al añadir la ruta de clientes, dejando el panel accesible sin sesión — detectado y arreglado antes de que llegara a producción.
+- Pendiente: formulario de creación de clientes.
