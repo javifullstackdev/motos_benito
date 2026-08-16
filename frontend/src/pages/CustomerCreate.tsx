@@ -80,7 +80,7 @@ function CustomerCreate() {
                             <option value="avenida">Avenida</option>
                             <option value="plaza">Plaza</option>
                             <option value="pasaje">Pasaje</option>
-                            <option value="paseo">Camino</option>
+                            <option value="camino">Camino</option>
                             <option value="paseo">Paseo</option>
                         </select>
                     </div>

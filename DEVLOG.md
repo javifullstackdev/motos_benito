@@ -140,3 +140,12 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Ruta `/customers/new` añadida y protegida; enlazada desde el listado con `<Link>`.
 - Probado el flujo completo: login → ver clientes → crear cliente nuevo → vuelve al listado y aparece correctamente.
 - Siguiente paso (Fase 8.5): gestión de artículos (listar, crear) — mismo patrón, aplicado más rápido esta vez.
+
+
+## 2026-08-16 — Fase 8.5 completada: gestión de artículos (listar y crear)
+
+- `frontend/src/pages/ItemList.tsx` e `ItemCreate.tsx`: mismo patrón que clientes, aplicado a `Item` (nombre, precio, en stock).
+- Introducido el patrón de casilla de verificación controlada: usa `checked` (no `value`) y su propio `onChange` leyendo `event.target.checked`
+- Añadido un `<select>` de tipo de vía en el formulario de clientes.
+- Rutas `/items` y `/items/new` añadidas y protegidas, con enlaces desde el panel y el listado.
+- Siguiente paso (Fase 8.6): el formulario de nueva factura, con autorelleno de cliente y artículo — el objetivo original de todo el proyecto.

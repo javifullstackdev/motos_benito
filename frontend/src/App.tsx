@@ -5,6 +5,8 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CustomerList from "./pages/CustomerList";
 import CustomerCreate from "./pages/CustomerCreate";
+import ItemList from "./pages/ItemList";
+import ItemCreate from "./pages/ItemCreate";
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/customers" element={<ProtectedRoute><CustomerList /></ProtectedRoute>} />
           <Route path="/customers/new" element={<ProtectedRoute><CustomerCreate /></ProtectedRoute>} />
+          <Route path="/items" element={<ProtectedRoute><ItemList /></ProtectedRoute>} />
+          <Route path="/items/new" element={<ProtectedRoute><ItemCreate /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
