@@ -4,6 +4,7 @@ import { Prisma } from "../generated/prisma/client";
 import { requireAuth } from "../middleware/requireAuth";
 import crypto from "crypto";
 import QRCode from "qrcode";
+import { generatePdf, buildInvoiceHtml } from "../lib/pdf";
 
 const router = Router();
 
@@ -15,6 +16,11 @@ function calculateInitials(firstName: string, lastName1: string, lastName2: stri
 
 function calculateHash(previousHash: string, data: string): string {
     return crypto.createHash("sha256").update(previousHash + data).digest("hex");
+}
+
+async function generateInvoiceQr(invoice: any): Promise<string> {
+    const qrContent = `NIF:${invoice.employee.nationalId}|NUM:${invoice.invoiceNumber}|FECHA:${invoice.issueDate}|IMPORTE:${invoice.total}`;
+    return await QRCode.toDataURL(qrContent);
 }
 
 async function createInvoiceWithRetry(
@@ -149,13 +155,35 @@ router.get("/:id/qr", async (req, res) => {
         return res.status(404).json({ error: "Invoice not found" });
     }
 
-    const qrContent =
-    `NIF:${invoice.employee.nationalId}|NUM:${invoice.invoiceNumber}|FECHA:${invoice.issueDate}|IMPORTE:${invoice.total}`;
-
-    const qr = await QRCode.toDataURL(qrContent);
+    const qr = await generateInvoiceQr(invoice);
 
     res.json({ qr });
 
+});
+
+router.get("/:id/pdf", async (req, res) => {
+    const id = Number(req.params.id);
+
+    const invoice = await prisma.invoice.findUnique({
+        where: { invoiceId: id },
+        include: {
+            employee: true,
+            customer: true,
+            workshop: true,
+            invoiceLines: true,
+        },
+    });
+
+    if (!invoice) {
+        return res.status(404).json({ error: "Invoice not found" });
+    }
+
+    const qrDataUrl = await generateInvoiceQr(invoice);
+    const html = buildInvoiceHtml(invoice, qrDataUrl);
+    const pdfBuffer = await generatePdf(html);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.send(pdfBuffer);
 });
 
 export default router;

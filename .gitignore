@@ -9,3 +9,4 @@ build/
 .claude/
 .windsurf/
 skills-lock.json
+*.pdf

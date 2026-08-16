@@ -81,3 +81,12 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Endpoint `GET /api/invoices/:id/qr`: genera un código QR (imagen en base64) a partir de los datos clave de la factura (NIF del empleado, número, fecha, importe), usando la librería `qrcode`.
 - Probado generando y visualizando el QR en el navegador — funciona correctamente.
 - **Pendiente de validación oficial**: el contenido actual del QR es un texto de ejemplo (`NIF:...|NUM:...|FECHA:...|IMPORTE:...`), no el formato exacto que exige la normativa Veri*Factu. Al escanearlo con la cámara del móvil, dio "contenido no válido" — probablemente porque el formato oficial real es una URL (que las cámaras reconocen de forma nativa), no texto libre. Antes de producción, hay que confirmar el formato exacto con la documentación oficial de la AEAT (o la gestoría) y actualizar `qrContent` en consecuencia — el resto de la implementación no cambiaría.
+
+
+## 2026-08-16 — Fase 7 completada: generación de PDF
+
+- `src/lib/pdf.ts`: `generatePdf(html)` usa Puppeteer (Chrome headless) para convertir cualquier HTML en un PDF; `buildInvoiceHtml(invoice, qrDataUrl)` construye la plantilla de la factura con los datos del taller, el empleado emisor, el cliente, la tabla de líneas, el desglose de IVA/total, y el código QR incrustado.
+- Endpoint `GET /api/invoices/:id/pdf`: junta todo (factura con sus relaciones completas, QR, HTML, PDF) y lo devuelve como descarga real (`Content-Type: application/pdf`).
+- Refactor: la generación del contenido del QR se extrajo a una función compartida (`generateInvoiceQr`), reutilizada tanto por `/qr` como por `/pdf`, evitando duplicar lógica.
+- Aprendido de paso: las sesiones en memoria (`MemoryStore`) se pierden cada vez que el servidor se reinicia (por ejemplo, al guardar un archivo con `tsx watch` corriendo) — hay que volver a hacer login tras cada reinicio durante el desarrollo.
+- Probado de principio a fin: login → generar PDF de la factura 1 → verificado visualmente que todos los datos y el QR aparecen correctamente.
