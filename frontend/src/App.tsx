@@ -7,6 +7,7 @@ import CustomerList from "./pages/CustomerList";
 import CustomerCreate from "./pages/CustomerCreate";
 import ItemList from "./pages/ItemList";
 import ItemCreate from "./pages/ItemCreate";
+import InvoiceCreate from "./pages/InvoiceCreate";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/customers/new" element={<ProtectedRoute><CustomerCreate /></ProtectedRoute>} />
           <Route path="/items" element={<ProtectedRoute><ItemList /></ProtectedRoute>} />
           <Route path="/items/new" element={<ProtectedRoute><ItemCreate /></ProtectedRoute>} />
+          <Route path="/invoices/new" element={<ProtectedRoute><InvoiceCreate /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

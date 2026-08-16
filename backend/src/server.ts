@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth";
 import customersRoutes from "./routes/customers";
 import itemsRoutes from "./routes/items";
 import invoicesRoutes from "./routes/invoices";
+import workshopsRoutes from "./routes/workshops";
 
 
 const app = express();
@@ -37,6 +38,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/customers", customersRoutes);
 app.use("/api/items", itemsRoutes);
 app.use("/api/invoices", invoicesRoutes);
+app.use("/api/workshops", workshopsRoutes);
 
 declare module "express-session" {
     interface SessionData {

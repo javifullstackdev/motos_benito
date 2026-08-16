@@ -149,3 +149,14 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Añadido un `<select>` de tipo de vía en el formulario de clientes.
 - Rutas `/items` y `/items/new` añadidas y protegidas, con enlaces desde el panel y el listado.
 - Siguiente paso (Fase 8.6): el formulario de nueva factura, con autorelleno de cliente y artículo — el objetivo original de todo el proyecto.
+
+
+## 2026-08-16 — Fase 8.6 completada: formulario de nueva factura con autorelleno
+
+- Añadido `GET /api/workshops` en el backend (solo lectura, ya que los 2 talleres son datos fijos sembrados).
+- `frontend/src/pages/InvoiceCreate.tsx`: formulario completo con desplegable de taller, autorelleno de cliente y de artículo por línea usando `<datalist>` (sugiere coincidencias existentes mientras escribes, sin necesidad de un componente de autocompletado a medida).
+- Líneas de factura dinámicas: array de objetos en el estado, con funciones `addLine`/`removeLine`/`updateLine` siguiendo el patrón estándar de React para actualizar un array sin mutarlo directamente.
+- Validación antes de enviar: si el cliente o cualquier artículo escrito no coincide con un registro real del catálogo, se bloquea el envío — así se cumple de verdad el objetivo de mantener uniformidad en los datos.
+- Tras crear la factura con éxito, se muestra el número generado y un enlace directo de descarga del PDF (`/api/invoices/:id/pdf`).
+- Probado el flujo completo de principio a fin: login → nueva factura → taller + cliente + artículos autorellenados → factura creada → PDF descargado correctamente.
+- Pendiente (Fase 8.7): listado de facturas.
