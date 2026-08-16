@@ -90,3 +90,11 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Refactor: la generación del contenido del QR se extrajo a una función compartida (`generateInvoiceQr`), reutilizada tanto por `/qr` como por `/pdf`, evitando duplicar lógica.
 - Aprendido de paso: las sesiones en memoria (`MemoryStore`) se pierden cada vez que el servidor se reinicia (por ejemplo, al guardar un archivo con `tsx watch` corriendo) — hay que volver a hacer login tras cada reinicio durante el desarrollo.
 - Probado de principio a fin: login → generar PDF de la factura 1 → verificado visualmente que todos los datos y el QR aparecen correctamente.
+
+
+## 2026-08-16 — Fase 8.0 completada: entorno del frontend
+
+- Proyecto React + TypeScript creado con Vite (`frontend/`), usando ESLint como linter.
+- Tailwind CSS instalado y configurado mediante su plugin oficial de Vite (`@tailwindcss/vite`) — sin necesidad de archivo de configuración aparte para lo básico.
+- Limpiado el contenido de ejemplo de Vite en `App.tsx`, sustituido por un placeholder mínimo. Verificado que las clases de Tailwind se aplican correctamente (tamaño de letra, negrita y color comprobados en el navegador).
+- Siguiente paso (Fase 8.1): estructura base del frontend y comunicación con la API del backend.
