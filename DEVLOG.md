@@ -114,3 +114,13 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Manejo de estados: `isLoading` (deshabilita el botón y cambia su texto mientras se envía), `error` (muestra el mensaje del backend si el login falla).
 - Probado con éxito: login correcto con las credenciales de Fernando, y mensaje de error visible con credenciales incorrectas.
 - Pendiente para la Fase 8.3: sistema de rutas (React Router) y protección de páginas privadas — de momento `Login` se muestra directamente en `App.tsx` sin navegación real tras el login.
+
+
+## 2026-08-16 — Fase 8.3 completada: rutas y protección de páginas privadas
+
+- Instalado `react-router-dom`: rutas `/login` (pública) y `/` (protegida, con `Dashboard` como placeholder).
+- `AuthContext` (Context API de React): mantiene el empleado logueado (`employee`), comprueba la sesión existente contra `/api/auth/me` al arrancar la app, y expone `login()`/`logout()`.
+- `ProtectedRoute`: redirige a `/login` si no hay sesión válida, esperando primero a que termine la comprobación inicial (`isLoading`) para evitar redirecciones incorrectas mientras se carga.
+- Backend: `POST /api/auth/login` ahora también devuelve los datos del empleado (sin la contraseña), igual que `/me`, para no tener que hacer una segunda petición tras el login.
+- `Login.tsx` actualizado: al iniciar sesión con éxito, actualiza el contexto (`login(data.user)`) y navega al panel protegido (`navigate("/")`).
+- Siguiente paso (Fase 8.4): gestión de clientes (listar, crear) en el frontend.

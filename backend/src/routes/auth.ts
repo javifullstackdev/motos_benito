@@ -20,7 +20,17 @@ router.post("/login", async (req, res) => {
     }
 
     req.session.emplId = user.emplId;
-    res.json({ message: "Bienvenido de nuevo, " + user.firstName });
+    res.json({ 
+        message: "Bienvenido de nuevo, " + user.firstName,
+        user: {
+            emplId: user.emplId,
+            firstName: user.firstName,
+            lastName1: user.lastName1,
+            lastName2: user.lastName2,
+            email: user.email,
+            active: user.active,
+        },
+    });
 });
 
 router.post("/logout", (req, res) => {

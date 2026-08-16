@@ -1,12 +1,15 @@
 import apiFetch from "../api/client";
-
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+    const { login } = useAuth();
 
     async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
@@ -18,7 +21,8 @@ function Login() {
                 method: "POST",
                 body: JSON.stringify({ email, password }),
             });
-            console.log(data);
+            login(data.user);
+            navigate("/");
         } catch (err) {
             setError((err as Error).message);
         } finally {
