@@ -132,3 +132,11 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Ruta `/customers` añadida y protegida con `ProtectedRoute`, enlazada desde el panel principal con `<Link>` (navegación sin recargar la página).
 - Corregido un fallo de seguridad real: la ruta `/` había perdido su envoltorio `ProtectedRoute` al añadir la ruta de clientes, dejando el panel accesible sin sesión — detectado y arreglado antes de que llegara a producción.
 - Pendiente: formulario de creación de clientes.
+
+
+## 2026-08-16 — Fase 8.4 completada: gestión de clientes (listar y crear)
+
+- `frontend/src/pages/CustomerCreate.tsx`: formulario de creación con estado de objeto único (`formData`) y una función `handleChange` genérica reutilizada por los 12 campos — patrón más escalable que un `useState` por campo, usado en formularios grandes.
+- Ruta `/customers/new` añadida y protegida; enlazada desde el listado con `<Link>`.
+- Probado el flujo completo: login → ver clientes → crear cliente nuevo → vuelve al listado y aparece correctamente.
+- Siguiente paso (Fase 8.5): gestión de artículos (listar, crear) — mismo patrón, aplicado más rápido esta vez.
