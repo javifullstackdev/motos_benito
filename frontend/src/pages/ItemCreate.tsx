@@ -45,7 +45,7 @@ function ItemCreate() {
                         <input type="text" id="name" name="name" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.name} onChange={handleChange} />
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="unitPrice" className="block text-sm font-medium text-gray-700">Precio</label>
+                        <label htmlFor="unitPrice" className="block text-sm font-medium text-gray-700">Precio (IVA incluido)</label>
                         <input type="number" id="unitPrice" name="unitPrice" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.unitPrice} onChange={handleChange} />
                     </div>
                     <div className="mb-4 flex items-center gap-2">

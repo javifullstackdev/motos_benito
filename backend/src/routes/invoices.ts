@@ -59,16 +59,16 @@ async function createInvoiceWithRetry(
                     const lineSubtotals = lines.map((line) => ({
                         ...line,
                         lineSubtotal: line.unitPrice.mul(line.quantity),
-                    }));
-
-                    const subtotal = lineSubtotals.reduce(
+                      }));
+                      
+                    const total = lineSubtotals.reduce(
                         (acc, line) => acc.plus(line.lineSubtotal),
-                        new Prisma.Decimal(0),
+                        new Prisma.Decimal(0)
                     );
-
+                      
                     const taxRate = new Prisma.Decimal(21);
-                    const taxAmount = subtotal.times(taxRate).dividedBy(100);
-                    const total = subtotal.plus(taxAmount);
+                    const subtotal = total.div(taxRate.div(100).plus(1));
+                    const taxAmount = total.minus(subtotal);
 
                     const dataToHash = `${employee.nationalId}-${invoiceNumber}-${total.toString()}`;
                     const currentHash = calculateHash(previousHash, dataToHash);

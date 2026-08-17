@@ -175,3 +175,11 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - `Layout.tsx`: barra de navegación compartida (aplicada automáticamente a todas las páginas protegidas a través de `ProtectedRoute`), con menú hamburguesa real en pantallas estrechas — botón que alterna un estado (`isMenuOpen`), mostrando enlaces en fila en escritorio (`hidden sm:flex`) o apilados en un panel desplegable en móvil (`sm:hidden`), sin que ambas vistas coincidan nunca.
 - Las 3 tablas (`CustomerList`, `ItemList`, `InvoiceList`) envueltas en un contenedor con `overflow-x-auto`, para que se puedan desplazar horizontalmente en pantallas estrechas en vez de romper el diseño.
 - Con esto, la **Fase 8 (frontend) queda completa**: login, navegación protegida, gestión de clientes y artículos, creación de facturas con autorelleno, listado y descarga de PDF, todo con una interfaz consistente y usable tanto en escritorio como en móvil.
+
+
+## 2026-08-16 — Pulido del frontend: login, PDF y corrección de IVA
+
+- **Login rediseñado**: tarjeta centrada con sombra, marcador de logo, fondo con degradado sutil, estados de foco en los inputs, spinner animado en el botón mientras carga, y caja de error con estilo propio.
+- **PDF de factura rediseñado**: cabecera con espacio para logo + título/número/fecha, datos del emisor (empleado + taller) y del cliente en dos columnas, tabla de líneas con importes alineados a la derecha, totales en formato factura real (base imponible / IVA / total destacado), y pie de página con QR + nota de verificación.
+- **Corrección importante de cálculo**: los precios de los artículos se interpretan ahora como **IVA incluido** (lo habitual de cara al cliente final), en vez de sumar el IVA aparte. El backend ahora calcula el `total` directamente a partir de los precios (que ya lo incluyen), y **deriva** la base imponible y el IVA a partir de ese total (`base = total / 1.21`), en vez de calcular la base primero y sumarle el IVA después.
+- Probado con una factura de prueba nueva, confirmando que los importes cuadran correctamente.
