@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import Layout from "./Layout";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { employee, isLoading } = useAuth();
@@ -12,7 +13,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" />;
   }
 
-  return children;
+  return <Layout>{children}</Layout>;
 }
 
 export default ProtectedRoute;

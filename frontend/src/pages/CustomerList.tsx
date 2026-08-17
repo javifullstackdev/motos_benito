@@ -32,26 +32,28 @@ function CustomerList() {
         <div className="max-w-4xl mx-auto p-6">
           <h1 className="text-2xl font-bold mb-4">Clientes</h1>
           <Link to="/customers/new" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Nuevo cliente</Link>
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="border-b text-left">
-                <th className="p-2">Nombre</th>
-                <th className="p-2">NIF/CIF</th>
-                <th className="p-2">Teléfono</th>
-                <th className="p-2">Email</th>
-              </tr>
-            </thead>
-            <tbody>
-              {customers.map((customer) => (
-                <tr key={customer.customerId} className="border-b">
-                  <td className="p-2">{customer.name}</td>
-                  <td className="p-2">{customer.taxId}</td>
-                  <td className="p-2">{customer.phone}</td>
-                  <td className="p-2">{customer.email}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b text-left">
+                  <th className="p-2">Nombre</th>
+                  <th className="p-2">NIF/CIF</th>
+                  <th className="p-2">Teléfono</th>
+                  <th className="p-2">Email</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {customers.map((customer) => (
+                  <tr key={customer.customerId} className="border-b">
+                    <td className="p-2">{customer.name}</td>
+                    <td className="p-2">{customer.taxId}</td>
+                    <td className="p-2">{customer.phone}</td>
+                    <td className="p-2">{customer.email}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
     );
 }

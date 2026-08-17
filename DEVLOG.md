@@ -168,3 +168,10 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - `frontend/src/pages/InvoiceList.tsx`: tabla con número de factura, cliente, taller, empleado, fecha, total y enlace de descarga directa del PDF.
 - Con esto, el ciclo completo de facturación ya es utilizable de principio a fin desde el navegador: crear cliente/artículo → crear factura con autorelleno → listar facturas → descargar PDF.
 - Pendiente (Fase 8.8): pulido visual y responsive.
+
+
+## 2026-08-16 — Fase 8.8 completada: pulido visual y responsive
+
+- `Layout.tsx`: barra de navegación compartida (aplicada automáticamente a todas las páginas protegidas a través de `ProtectedRoute`), con menú hamburguesa real en pantallas estrechas — botón que alterna un estado (`isMenuOpen`), mostrando enlaces en fila en escritorio (`hidden sm:flex`) o apilados en un panel desplegable en móvil (`sm:hidden`), sin que ambas vistas coincidan nunca.
+- Las 3 tablas (`CustomerList`, `ItemList`, `InvoiceList`) envueltas en un contenedor con `overflow-x-auto`, para que se puedan desplazar horizontalmente en pantallas estrechas en vez de romper el diseño.
+- Con esto, la **Fase 8 (frontend) queda completa**: login, navegación protegida, gestión de clientes y artículos, creación de facturas con autorelleno, listado y descarga de PDF, todo con una interfaz consistente y usable tanto en escritorio como en móvil.
