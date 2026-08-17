@@ -186,4 +186,23 @@ router.get("/:id/pdf", async (req, res) => {
     res.send(pdfBuffer);
 });
 
+router.get("/", async (req, res) => {
+    const invoices = await prisma.invoice.findMany({
+      include: {
+        customer: {
+          select: { customerId: true, name: true },
+        },
+        workshop: {
+          select: { workshopId: true, name: true },
+        },
+        employee: {
+          select: { emplId: true, firstName: true, lastName1: true },
+        },
+      },
+      orderBy: { invoiceId: "desc" },
+    });
+  
+    res.json({ invoices });
+  });
+
 export default router;

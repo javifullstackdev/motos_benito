@@ -160,3 +160,11 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Tras crear la factura con éxito, se muestra el número generado y un enlace directo de descarga del PDF (`/api/invoices/:id/pdf`).
 - Probado el flujo completo de principio a fin: login → nueva factura → taller + cliente + artículos autorellenados → factura creada → PDF descargado correctamente.
 - Pendiente (Fase 8.7): listado de facturas.
+
+
+## 2026-08-16 — Fase 8.7 completada: listado de facturas
+
+- Añadido `GET /api/invoices` en el backend, incluyendo cliente, taller y empleado emisor mediante `select` anidado dentro de `include` — mismo principio que `/me`, aplicado ahora a relaciones incluidas, para no filtrar la contraseña del empleado.
+- `frontend/src/pages/InvoiceList.tsx`: tabla con número de factura, cliente, taller, empleado, fecha, total y enlace de descarga directa del PDF.
+- Con esto, el ciclo completo de facturación ya es utilizable de principio a fin desde el navegador: crear cliente/artículo → crear factura con autorelleno → listar facturas → descargar PDF.
+- Pendiente (Fase 8.8): pulido visual y responsive.

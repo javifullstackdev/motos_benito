@@ -31,6 +31,11 @@ function Dashboard() {
           Crear factura
         </Link>
       </li>
+      <li>
+        <Link to="/invoices" className="text-blue-600 underline">
+          Ver facturas
+        </Link>
+      </li>
       </ul>
     </div>
   );
