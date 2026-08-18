@@ -49,7 +49,11 @@ function ItemList() {
               <tbody>
               {filteredItems.map((item) => (
                   <tr key={item.itemId} className="border-b">
-                    <td className="p-2">{item.name}</td>
+                    <td className="p-2">
+                      <Link to={`/items/${item.itemId}`} className="text-blue-600 hover:underline">
+                        {item.name}
+                      </Link>
+                    </td>
                     <td className="p-2">{item.unitPrice}</td>
                     <td className="p-2">{item.inStock ? "Sí" : "No"}</td>
                   </tr>

@@ -198,3 +198,11 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Nuevo endpoint `GET /api/stats/revenue-by-month`: agrupa la facturación por mes (agregación hecha en JavaScript, ya que Prisma no agrupa directamente por fragmentos de fecha).
 - `Dashboard.tsx` rediseñado: accesos rápidos (nueva factura/cliente/artículo), paneles de últimas facturas, últimos clientes y artículos más vendidos, y una gráfica de líneas de ingresos por mes con `recharts`.
 - Corregido `customers.ts` para ordenar por `customerId` descendente (necesario para que "últimos clientes" muestre los más recientes de verdad).
+
+
+## 2026-08-16 — Fichas de cliente y artículo (ver y editar)
+
+- `CustomerDetail.tsx` e `ItemDetail.tsx`: páginas nuevas que cargan un registro existente por su id (`useParams()`, con `[id]` como dependencia del `useEffect` para recargar si cambia), precargan el formulario con sus datos reales, y permiten editarlo y guardarlo con `PUT` (reutilizando los endpoints ya existentes desde la Fase 4).
+- El nombre de cada cliente/artículo en `CustomerList.tsx`/`ItemList.tsx` es ahora un enlace directo a su ficha.
+- Rutas `/customers/:id` y `/items/:id` añadidas y protegidas.
+- Probado de principio a fin: clic en un nombre → ficha precargada → editar → guardar → vuelve al listado con el cambio aplicado.

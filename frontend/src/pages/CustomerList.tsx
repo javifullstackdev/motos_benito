@@ -61,7 +61,11 @@ function CustomerList() {
               <tbody>
               {filteredCustomers.map((customer) => (
                   <tr key={customer.customerId} className="border-b">
-                    <td className="p-2">{customer.name}</td>
+                    <td className="p-2">
+                      <Link to={`/customers/${customer.customerId}`} className="text-blue-600 hover:underline">
+                        {customer.name}
+                      </Link>
+                    </td>
                     <td className="p-2">{customer.taxId}</td>
                     <td className="p-2">{customer.phone}</td>
                     <td className="p-2">{customer.email}</td>
