@@ -183,3 +183,10 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - **PDF de factura rediseñado**: cabecera con espacio para logo + título/número/fecha, datos del emisor (empleado + taller) y del cliente en dos columnas, tabla de líneas con importes alineados a la derecha, totales en formato factura real (base imponible / IVA / total destacado), y pie de página con QR + nota de verificación.
 - **Corrección importante de cálculo**: los precios de los artículos se interpretan ahora como **IVA incluido** (lo habitual de cara al cliente final), en vez de sumar el IVA aparte. El backend ahora calcula el `total` directamente a partir de los precios (que ya lo incluyen), y **deriva** la base imponible y el IVA a partir de ese total (`base = total / 1.21`), en vez de calcular la base primero y sumarle el IVA después.
 - Probado con una factura de prueba nueva, confirmando que los importes cuadran correctamente.
+
+
+## 2026-08-16 — Búsqueda dentro de cada sección
+
+- Añadida una caja de búsqueda en `CustomerList.tsx`, `ItemList.tsx` e `InvoiceList.tsx`, filtrando en el propio frontend sobre los datos ya cargados con `.filter()` (sin tocar el backend).
+- Búsqueda insensible a mayúsculas/minúsculas, comparando contra varios campos a la vez (nombre, NIF, teléfono, email en clientes; nombre, precio, stock en artículos; número, cliente, taller, empleado, fecha, total en facturas).
+- Primer paso de una mejora más grande del Dashboard/búsqueda: pendiente el panel de artículos más vendidos, la gráfica de ingresos, y una búsqueda general.

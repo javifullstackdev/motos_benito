@@ -16,6 +16,18 @@ function InvoiceList() {
 
     const [invoices, setInvoices] = useState<Invoice[]>([]);
 
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const filteredInvoices = invoices.filter((invoice) =>
+      invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.workshop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.employee.lastName1.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.issueDate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.total.toString().includes(searchTerm.toLowerCase())
+    );
+
     useEffect(() => {
         apiFetch("/api/invoices")
         .then((data) => setInvoices(data.invoices))
@@ -25,6 +37,13 @@ function InvoiceList() {
     return (
         <div className="max-w-4xl mx-auto p-6">
           <h1 className="text-2xl font-bold mb-4">Facturas</h1>
+          <input
+            type="text"
+            placeholder="Buscar facturas..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:w-64 rounded-lg border border-gray-300 px-3 py-2 text-sm mb-4"
+          />
           <Link to="/invoices/new" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Nueva factura</Link>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
@@ -40,7 +59,7 @@ function InvoiceList() {
                 </tr>
                 </thead>
                 <tbody>
-                {invoices.map((invoice) => (
+                {filteredInvoices.map((invoice) => (
                     <tr key={invoice.invoiceId} className="border-b">
                     <td className="p-2">{invoice.invoiceNumber}</td>
                     <td className="p-2">{invoice.customer.name}</td>
