@@ -190,3 +190,11 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Añadida una caja de búsqueda en `CustomerList.tsx`, `ItemList.tsx` e `InvoiceList.tsx`, filtrando en el propio frontend sobre los datos ya cargados con `.filter()` (sin tocar el backend).
 - Búsqueda insensible a mayúsculas/minúsculas, comparando contra varios campos a la vez (nombre, NIF, teléfono, email en clientes; nombre, precio, stock en artículos; número, cliente, taller, empleado, fecha, total en facturas).
 - Primer paso de una mejora más grande del Dashboard/búsqueda: pendiente el panel de artículos más vendidos, la gráfica de ingresos, y una búsqueda general.
+
+
+## 2026-08-16 — Dashboard con contenido real y gráfica de ingresos
+
+- Nuevo endpoint `GET /api/stats/top-items`: usa `groupBy` de Prisma para calcular los 5 artículos más vendidos (sumando cantidades de todas las líneas de factura), combinado con una segunda consulta para traer sus nombres.
+- Nuevo endpoint `GET /api/stats/revenue-by-month`: agrupa la facturación por mes (agregación hecha en JavaScript, ya que Prisma no agrupa directamente por fragmentos de fecha).
+- `Dashboard.tsx` rediseñado: accesos rápidos (nueva factura/cliente/artículo), paneles de últimas facturas, últimos clientes y artículos más vendidos, y una gráfica de líneas de ingresos por mes con `recharts`.
+- Corregido `customers.ts` para ordenar por `customerId` descendente (necesario para que "últimos clientes" muestre los más recientes de verdad).

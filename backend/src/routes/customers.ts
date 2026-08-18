@@ -7,7 +7,9 @@ const router = Router();
 router.use(requireAuth);
 
 router.get("/", async (req, res) => {
-    const customers = await prisma.customer.findMany();
+    const customers = await prisma.customer.findMany({
+        orderBy: { customerId: "desc" },
+    });
     res.json({ customers });
 });
 
