@@ -1,6 +1,9 @@
 import express from "express";
 import "dotenv/config";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import { Pool } from "pg";
+import cors from "cors";
 import authRoutes from "./routes/auth";
 import customersRoutes from "./routes/customers";
 import itemsRoutes from "./routes/items";
@@ -8,12 +11,15 @@ import invoicesRoutes from "./routes/invoices";
 import workshopsRoutes from "./routes/workshops";
 import statsRoutes from "./routes/stats";
 
-
 const app = express();
 
 const port = process.env.PORT ?? 3000;
 
-import cors from "cors";
+const pgPool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+});
+
+const PgStore = connectPgSimple(session);
 
 app.use(
     cors({
@@ -22,18 +28,24 @@ app.use(
     })
 );
 
-app.use(express.json());
-
 app.use(
     session({
+        store: new PgStore({
+            pool: pgPool,
+            createTableIfMissing: true,
+        }),
         secret: process.env.SESSION_SECRET ?? "dev-secret-change-me",
         resave: false,
         saveUninitialized: false,
         cookie: {
-            maxAge: 1000 * 60 * 60 * 8, // 8 hours
+            maxAge: 1000 * 60 * 60 * 8,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         },
     })
 );
+
+app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/customers", customersRoutes);

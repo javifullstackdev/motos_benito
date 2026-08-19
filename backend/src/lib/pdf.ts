@@ -8,7 +8,9 @@ const logoSvg = fs.readFileSync(
 );
 
 export async function generatePdf(html: string): Promise<Buffer> {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
   const page = await browser.newPage();
   await page.setContent(html, { waitUntil: "networkidle0" });
   const pdfBuffer = await page.pdf({
@@ -397,7 +399,7 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
         <div class="footer-info">
           <p class="guarantee">Garantía en reparaciones y repuestos según normativa vigente.</p>
           <p class="legal">Motos Benito | Taller mecánico especializado</p>
-          <p class="legal">Documento electrónico emitido conforme a la legislación fiscal aplicable.</p>
+          <p class="legal">Documento electrónico emitido conforme a la legislación fiscal actual.</p>
         </div>
 
         <div class="qr-block">

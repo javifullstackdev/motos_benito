@@ -216,3 +216,13 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Página de política de privacidad (`/privacidad`, ruta pública) con la estructura estándar exigida por el RGPD — marcada explícitamente como borrador pendiente de revisión legal, sobre todo en cuanto a quién es el "responsable del tratamiento" (Fernando y David son autónomos independientes, sin entidad jurídica conjunta).
 - `Workshop` (talleres): la dirección pasa de un único campo `address` a los mismos 6 campos desglosados que ya usan `Employee`/`Customer` (tipo de vía, calle, número, ciudad, provincia, código postal, país) — con su migración correspondiente, y actualizado el PDF y el `seed.ts`.
 - Varias mejoras adicionales de diseño, branding y UX/UI en toda la app, en escritorio y móvil.
+
+
+## 2026-08-19 — Preparación para despliegue: sesiones persistentes y Puppeteer en contenedor
+
+- Sustituido el almacén de sesiones en memoria (`MemoryStore`) por `connect-pg-simple`, guardando las sesiones como filas en la propia base de datos PostgreSQL — sobreviven a reinicios del servidor, tanto en desarrollo como en producción (esencial para no perder sesiones aleatoriamente en un hosting real).
+- Cookie de sesión configurada de forma condicional según el entorno: `secure`/`sameSite: "none"` en producción (necesario porque frontend y backend viven en dominios distintos), `sameSite: "lax"` en desarrollo (suficiente porque `localhost` en distintos puertos se considera "mismo sitio").
+- Puppeteer configurado con `--no-sandbox`/`--disable-setuid-sandbox`, necesario para poder arrancar Chrome dentro de un contenedor Docker (como los que usa Railway).
+- Corregido un bug real: se quedaron dos middlewares de sesión activos a la vez (el nuevo y el antiguo sin borrar), pisándose entre sí.
+- Probado: login funciona, y la sesión sobrevive a un reinicio del servidor sin tener que volver a autenticarse.
+- Siguiente paso: desplegar el backend + base de datos en Railway, y el frontend en Vercel.
