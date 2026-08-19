@@ -150,7 +150,7 @@ function InvoiceCreate() {
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
-              href={`${import.meta.env.VITE_API_URL}/api/invoices/${createdInvoice.invoiceId}/pdf`}
+              href={`/api/invoices/${createdInvoice.invoiceId}/pdf`}
               target="_blank"
               rel="noreferrer"
               download={`factura-${createdInvoice.invoiceNumber}.pdf`}
