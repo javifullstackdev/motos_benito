@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import apiFetch from "../api/client";
 
 type Workshop = {
@@ -24,7 +24,6 @@ type LineInput = {
 };
 
 function InvoiceCreate() {
-  const navigate = useNavigate();
 
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);

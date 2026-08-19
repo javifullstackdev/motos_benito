@@ -10,7 +10,14 @@ type Employee = {
     active: boolean;
 }
 
-const AuthContext = createContext(null);
+type AuthContextType = {
+    employee: Employee | null;
+    isLoading: boolean;
+    login: (employeeData: Employee) => void;
+    logout: () => void;
+};
+
+const AuthContext = createContext<AuthContextType | null>(null);
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
     const [employee, setEmployee] = useState<Employee | null>(null);
@@ -42,7 +49,11 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 function useAuth() {
-    return useContext(AuthContext);
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
 }
 
 export { AuthProvider, useAuth };
