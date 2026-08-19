@@ -7,12 +7,12 @@ const logoSvg = fs.readFileSync(
   "utf-8"
 );
 
-export async function generatePdf(html: string): Promise<Buffer> {
+export async function generatePdf(html: string): Promise<Uint8Array> {
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   const page = await browser.newPage();
-  await page.setContent(html, { waitUntil: "networkidle0" });
+  await page.setContent(html, { waitUntil: "load" });
   const pdfBuffer = await page.pdf({
     format: "A4",
     printBackground: true,

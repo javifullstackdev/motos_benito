@@ -43,7 +43,7 @@ router.post("/logout", (req, res) => {
 })
 
 router.get("/me", requireAuth, async (req, res) => {
-    const emplId = req.session.emplId;
+    const emplId = req.session.emplId!;
     const user = await prisma.employee.findUnique({
         where: { emplId },
         select: {

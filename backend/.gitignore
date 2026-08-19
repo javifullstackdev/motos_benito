@@ -4,3 +4,10 @@ node_modules
 
 /src/generated/prisma
 prisma/seed.ts
+prisma.config.js
+prisma.config.js.map
+prisma.config.d.ts
+prisma.config.d.ts.map
+prisma/*.js
+prisma/*.d.ts
+prisma/*.map

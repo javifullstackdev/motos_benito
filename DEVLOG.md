@@ -226,3 +226,13 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Corregido un bug real: se quedaron dos middlewares de sesión activos a la vez (el nuevo y el antiguo sin borrar), pisándose entre sí.
 - Probado: login funciona, y la sesión sobrevive a un reinicio del servidor sin tener que volver a autenticarse.
 - Siguiente paso: desplegar el backend + base de datos en Railway, y el frontend en Vercel.
+
+
+## 2026-08-19 — Preparación para producción: compilación real con `tsc`
+
+- Añadidos los scripts `build` (`prisma generate && tsc && shx cp -r src/assets dist/assets`) y `start` (`node dist/server.js`) — hasta ahora solo habíamos ejecutado el proyecto con `tsx`, que es mucho más permisivo que el compilador real de TypeScript.
+- `tsconfig.json`: `module` cambiado de `"nodenext"` a `"commonjs"`, y `verbatimModuleSyntax` desactivado — la combinación anterior exigía que cada archivo declarase explícitamente si era CommonJS o ESM, y entraba en conflicto con la sintaxis `import`/`export` que ya teníamos escrita en todo el proyecto.
+- Añadido `include: ["src/**/*"]` en `tsconfig.json`, para que `tsc` no intente compilar `prisma.config.ts` ni los scripts de `prisma/seed*.ts` (viven fuera de `src/`, y no forman parte del servidor en sí).
+- Corregidos varios errores reales que solo `tsc` (no `tsx`) detecta: un valor no válido en `page.setContent` de Puppeteer, un tipo de retorno desactualizado (`Buffer` → `Uint8Array`), y dos sitios donde faltaba confirmar explícitamente a TypeScript que un valor no sería `undefined` en tiempo de ejecución.
+- `shx` añadido como dependencia de desarrollo, para copiar la carpeta `assets/` (el logo) a `dist/` de forma que funcione igual en Windows (desarrollo) y Linux (Railway) — `tsc` no copia archivos que no sean `.ts`.
+- Probado: `npm run build` compila sin errores, y `npm run start` arranca el servidor ya compilado, sirviendo la app exactamente igual que en desarrollo.

@@ -11,7 +11,7 @@ const router = Router();
 router.use(requireAuth);
 
 function calculateInitials(firstName: string, lastName1: string, lastName2: string) : string {
-    return (firstName[0] + lastName1[0] + lastName2[0]).toUpperCase();
+    return (firstName[0]! + lastName1[0] + lastName2[0]).toUpperCase();
 }
 
 function calculateHash(previousHash: string, data: string): string {

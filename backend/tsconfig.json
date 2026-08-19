@@ -3,7 +3,7 @@
     "rootDir": "./src",
     "outDir": "./dist",
 
-    "module": "nodenext",
+    "module": "commonjs",
     "target": "esnext",
     "types": ["node"],
     "lib": ["esnext"],
@@ -17,10 +17,11 @@
     "exactOptionalPropertyTypes": true,
 
     "strict": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true
-  }
+  },
+  "include": ["src/**/*"]
 }
