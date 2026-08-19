@@ -15,9 +15,15 @@ datasource db {
 model Workshop {
   workshopId  Int @id @default(autoincrement()) @map("workshop_id")
   name String @unique
-  address String
+  streetType String @map("street_type")
+  streetName String @map("street_name")
+  streetNumber String @map("street_number")
+  city String
+  province String
+  postalCode String @map("postal_code")
+  country String
   phone String
-  email  String 
+  email String
   invoices Invoice[]
 
   @@map("workshops")

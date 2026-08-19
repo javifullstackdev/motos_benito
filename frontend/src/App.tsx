@@ -11,6 +11,7 @@ import InvoiceCreate from "./pages/InvoiceCreate";
 import InvoiceList from "./pages/InvoiceList";
 import ItemDetail from "./pages/ItemDetail";
 import CustomerDetail from "./pages/CustomerDetail";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/invoices" element={<ProtectedRoute><InvoiceList /></ProtectedRoute>} />
           <Route path="/customers/:id" element={<ProtectedRoute><CustomerDetail /></ProtectedRoute>} />
           <Route path="/items/:id" element={<ProtectedRoute><ItemDetail /></ProtectedRoute>} />
+          <Route path="/privacidad" element={<PrivacyPolicy />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

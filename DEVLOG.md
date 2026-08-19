@@ -206,3 +206,13 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - El nombre de cada cliente/artículo en `CustomerList.tsx`/`ItemList.tsx` es ahora un enlace directo a su ficha.
 - Rutas `/customers/:id` y `/items/:id` añadidas y protegidas.
 - Probado de principio a fin: clic en un nombre → ficha precargada → editar → guardar → vuelve al listado con el cambio aplicado.
+
+
+## 2026-08-19 — Logo, footer, política de privacidad y mejoras de diseño
+
+- Logo de la empresa incluido en tres sitios: la barra de navegación y el login (como imagen importada en React), y el PDF de factura (SVG insertado directamente en el HTML generado, leído del disco con `fs.readFileSync` al arrancar el servidor).
+- Corregido un fallo de maquetación: `CustomerCreate`, `ItemCreate`, `CustomerDetail` e `ItemDetail` usaban un envoltorio pensado para páginas de pantalla completa (`min-h-screen` + centrado), que entraba en conflicto con el `Layout` que ya las envuelve — sustituido por un contenedor simple (`max-w-md mx-auto p-6`), consistente con el resto de páginas.
+- `Footer.tsx` nuevo: copyright con año dinámico, enlace a la política de privacidad, y enlace al portfolio del desarrollador. Aplicado el patrón "sticky footer" en `Layout.tsx` (`flex flex-col` + `flex-1` en `<main>`) para que el footer quede siempre anclado abajo, incluso en páginas con poco contenido.
+- Página de política de privacidad (`/privacidad`, ruta pública) con la estructura estándar exigida por el RGPD — marcada explícitamente como borrador pendiente de revisión legal, sobre todo en cuanto a quién es el "responsable del tratamiento" (Fernando y David son autónomos independientes, sin entidad jurídica conjunta).
+- `Workshop` (talleres): la dirección pasa de un único campo `address` a los mismos 6 campos desglosados que ya usan `Employee`/`Customer` (tipo de vía, calle, número, ciudad, provincia, código postal, país) — con su migración correspondiente, y actualizado el PDF y el `seed.ts`.
+- Varias mejoras adicionales de diseño, branding y UX/UI en toda la app, en escritorio y móvil.

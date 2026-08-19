@@ -17,7 +17,13 @@ erDiagram
     WORKSHOPS {
         int workshop_id PK
         string name
-        string address
+        string street_type
+        string street_name
+        string street_number
+        string city
+        string province
+        string postal_code
+        string country
         string phone
         string email
     }

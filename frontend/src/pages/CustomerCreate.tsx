@@ -1,27 +1,29 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import apiFetch from "../api/client";
 
 function CustomerCreate() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    type: "",
+    type: "particular",
     taxId: "",
     name: "",
     phone: "",
     email: "",
-    streetType: "",
+    streetType: "calle",
     streetName: "",
     streetNumber: "",
     city: "",
     province: "",
     postalCode: "",
-    country: "",
+    country: "España",
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+  function handleChange(
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
@@ -45,75 +47,329 @@ function CustomerCreate() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-            <div className="max-w-md w-full">
-                <h1 className="text-2xl font-bold mb-4">Crear cliente</h1>
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                        <label htmlFor="type" className="block text-sm font-medium text-gray-700">Tipo de cliente</label>
-                        <select id="type" name="type" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.type} onChange = {handleChange}>
-                            <option value="particular">Particular</option>
-                            <option value="autonomo">Autónomo</option>
-                            <option value="empresa">Empresa</option>
-                        </select>
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="taxId" className="block text-sm font-medium text-gray-700">NIF/CIF</label>
-                        <input type="text" id="taxId" name="taxId" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.taxId} onChange={handleChange} />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nombre</label>
-                        <input type="text" id="name" name="name" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.name} onChange={handleChange} />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" id="email" name="email" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.email} onChange={handleChange} />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Teléfono</label>
-                        <input type="tel" id="phone" name="phone" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.phone} onChange={handleChange} />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="streetType" className="block text-sm font-medium text-gray-700">Tipo de vía</label>
-                        <select id="streetType" name="streetType" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.streetType} onChange={handleChange}>
-                            <option value="calle">Calle</option>
-                            <option value="avenida">Avenida</option>
-                            <option value="plaza">Plaza</option>
-                            <option value="pasaje">Pasaje</option>
-                            <option value="camino">Camino</option>
-                            <option value="paseo">Paseo</option>
-                        </select>
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="streetName" className="block text-sm font-medium text-gray-700">Nombre de la calle</label>
-                        <input type="text" id="streetName" name="streetName" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.streetName} onChange={handleChange} />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="streetNumber" className="block text-sm font-medium text-gray-700">Número de la calle</label>
-                        <input type="text" id="streetNumber" name="streetNumber" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.streetNumber} onChange={handleChange} />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="city" className="block text-sm font-medium text-gray-700">Ciudad</label>
-                        <input type="text" id="city" name="city" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.city} onChange={handleChange} />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="province" className="block text-sm font-medium text-gray-700">Provincia</label>
-                        <input type="text" id="province" name="province" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.province} onChange={handleChange} />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">Código postal</label>
-                        <input type="text" id="postalCode" name="postalCode" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.postalCode} onChange={handleChange} />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="country" className="block text-sm font-medium text-gray-700">País</label>
-                        <input type="text" id="country" name="country" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.country} onChange={handleChange} />
-                    </div>
-                    <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600" disabled={isLoading}>{isLoading ? "Cargando..." : "Crear cliente"}</button>
-                    {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-                </form>
-            </div>
+    <div className="max-w-4xl mx-auto px-4 py-8 text-neutral-100">
+      {/* Botón de retroceso */}
+      <div className="mb-6">
+        <Link
+          to="/customers"
+          className="inline-flex items-center gap-2 text-base font-semibold uppercase tracking-wider text-neutral-400 hover:text-orange-500 transition-colors"
+        >
+          <span>← Volver al directorio de clientes</span>
+        </Link>
+      </div>
+
+      {/* Tarjeta Dark Glassmorphism */}
+      <div className="relative overflow-hidden rounded-2xl border border-neutral-800/90 bg-neutral-900/85 p-6 sm:p-9 shadow-2xl backdrop-blur-xl">
+        {/* Acento racing superior */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-600 via-orange-500 to-neutral-800" />
+
+        {/* Encabezado */}
+        <div className="mb-8 border-b border-neutral-800 pb-5">
+          <h1 className="text-2xl font-extrabold tracking-tight text-white uppercase">
+            Alta de Nuevo Cliente
+          </h1>
+          <p className="text-base text-neutral-400 mt-1">
+            Introduce los datos fiscales y de localización para facturación y contacto
+          </p>
         </div>
-    );
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          
+          {/* SECCIÓN 1: DATOS FISCALES Y DE CONTACTO */}
+          <div>
+            <h2 className="text-base font-bold uppercase tracking-wider text-orange-500 mb-4 flex items-center gap-2">
+              <span>01</span>
+              <span className="text-neutral-300">Datos Principales y Fiscales</span>
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="type"
+                  className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                >
+                  Tipo de Cliente *
+                </label>
+                <select
+                  id="type"
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500 cursor-pointer"
+                >
+                  <option value="particular">Particular</option>
+                  <option value="autonomo">Autónomo</option>
+                  <option value="empresa">Empresa</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="taxId"
+                  className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                >
+                  NIF / CIF / NIE *
+                </label>
+                <input
+                  type="text"
+                  id="taxId"
+                  name="taxId"
+                  required
+                  placeholder="Ej. 12345678Z / B12345678"
+                  value={formData.taxId}
+                  onChange={handleChange}
+                  className="w-full font-mono rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label
+                  htmlFor="name"
+                  className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                >
+                  Nombre Completo / Razón Social *
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  placeholder="Ej. Manuel García Pérez / Talleres MotoSur S.L."
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="phone"
+                  className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                >
+                  Teléfono de Contacto *
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  required
+                  placeholder="Ej. 612 345 678"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                >
+                  Correo Electrónico
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="cliente@ejemplo.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* SECCIÓN 2: DIRECCIÓN POSTAL */}
+          <div className="border-t border-neutral-800/80 pt-6">
+            <h2 className="text-base font-bold uppercase tracking-wider text-orange-500 mb-4 flex items-center gap-2">
+              <span>02</span>
+              <span className="text-neutral-300">Dirección y Localización</span>
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+              <div className="sm:col-span-4">
+                <label
+                  htmlFor="streetType"
+                  className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                >
+                  Tipo de Vía
+                </label>
+                <select
+                  id="streetType"
+                  name="streetType"
+                  value={formData.streetType}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500 cursor-pointer"
+                >
+                  <option value="calle">Calle</option>
+                  <option value="avenida">Avenida</option>
+                  <option value="plaza">Plaza</option>
+                  <option value="pasaje">Pasaje</option>
+                  <option value="camino">Camino</option>
+                  <option value="paseo">Paseo</option>
+                  <option value="carretera">Carretera</option>
+                </select>
+              </div>
+
+              <div className="sm:col-span-6">
+                <label
+                  htmlFor="streetName"
+                  className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                >
+                  Nombre de la Vía
+                </label>
+                <input
+                  type="text"
+                  id="streetName"
+                  name="streetName"
+                  placeholder="Ej. Mayor, Real, Constitución"
+                  value={formData.streetName}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label
+                  htmlFor="streetNumber"
+                  className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                >
+                  Nº / Puerta
+                </label>
+                <input
+                  type="text"
+                  id="streetNumber"
+                  name="streetNumber"
+                  placeholder="Ej. 12 3ºB"
+                  value={formData.streetNumber}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+
+              <div className="sm:col-span-4">
+                <label
+                  htmlFor="city"
+                  className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                >
+                  Ciudad / Municipio
+                </label>
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  placeholder="Ej. Benalmádena"
+                  value={formData.city}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+
+              <div className="sm:col-span-3">
+                <label
+                  htmlFor="province"
+                  className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                >
+                  Provincia
+                </label>
+                <input
+                  type="text"
+                  id="province"
+                  name="province"
+                  placeholder="Ej. Málaga"
+                  value={formData.province}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label
+                  htmlFor="postalCode"
+                  className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                >
+                  C.P.
+                </label>
+                <input
+                  type="text"
+                  id="postalCode"
+                  name="postalCode"
+                  placeholder="Ej. 29630"
+                  value={formData.postalCode}
+                  onChange={handleChange}
+                  className="w-full font-mono rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+
+              <div className="sm:col-span-3">
+                <label
+                  htmlFor="country"
+                  className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                >
+                  País
+                </label>
+                <input
+                  type="text"
+                  id="country"
+                  name="country"
+                  placeholder="España"
+                  value={formData.country}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Mensaje de Error */}
+          {error && (
+            <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-950/60 p-3.5 text-base font-medium text-red-300 animate-in fade-in duration-200">
+              <svg
+                className="h-4 w-4 flex-shrink-0 text-red-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Botones de Acción */}
+          <div className="pt-4 border-t border-neutral-800/80 flex flex-col-reverse sm:flex-row items-center justify-end gap-3">
+            <Link
+              to="/customers"
+              className="w-full sm:w-auto text-center rounded-xl border border-neutral-700 bg-neutral-900 px-6 py-3 text-base font-bold text-neutral-300 transition-colors hover:bg-neutral-800 hover:text-white"
+            >
+              Cancelar
+            </Link>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-orange-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-orange-600/30 transition-all duration-200 hover:bg-orange-500 hover:shadow-orange-600/40 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  <span>Registrando cliente...</span>
+                </>
+              ) : (
+                <span>Guardar cliente</span>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 export default CustomerCreate;

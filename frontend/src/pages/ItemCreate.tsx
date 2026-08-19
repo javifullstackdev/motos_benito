@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import apiFetch from "../api/client";
 
 function ItemCreate() {
@@ -7,12 +7,14 @@ function ItemCreate() {
   const [formData, setFormData] = useState({
     name: "",
     unitPrice: "",
-    inStock: false,
+    inStock: true,
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+  function handleChange(
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
@@ -25,7 +27,10 @@ function ItemCreate() {
     try {
       await apiFetch("/api/items", {
         method: "POST",
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          unitPrice: Number(formData.unitPrice),
+        }),
       });
       navigate("/items");
     } catch (err) {
@@ -36,35 +41,155 @@ function ItemCreate() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-            <div className="max-w-md w-full">
-                <h1 className="text-2xl font-bold mb-4">Crear artículo</h1>
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Artículo</label>
-                        <input type="text" id="name" name="name" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.name} onChange={handleChange} />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="unitPrice" className="block text-sm font-medium text-gray-700">Precio (IVA incluido)</label>
-                        <input type="number" id="unitPrice" name="unitPrice" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.unitPrice} onChange={handleChange} />
-                    </div>
-                    <div className="mb-4 flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            id="inStock"
-                            name="inStock"
-                            checked={formData.inStock}
-                            onChange={(e) => setFormData((prev) => ({ ...prev, inStock: e.target.checked }))}
-                            className="h-4 w-4"
-                        />
-                        <label htmlFor="inStock" className="text-sm font-medium text-gray-700">En stock</label>
-                    </div>
-                    <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600" disabled={isLoading}>{isLoading ? "Cargando..." : "Crear artículo"}</button>
-                    {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-                </form>
-            </div>
+    <div className="max-w-2xl mx-auto px-4 py-8 text-neutral-100">
+      {/* Botón de retroceso y migas de pan */}
+      <div className="mb-6">
+        <Link
+          to="/items"
+          className="inline-flex items-center gap-2 text-base font-semibold uppercase tracking-wider text-neutral-400 hover:text-orange-500 transition-colors"
+        >
+          <span>← Volver al listado de artículos</span>
+        </Link>
+      </div>
+
+      {/* Tarjeta Dark Glassmorphism del Formulario */}
+      <div className="relative overflow-hidden rounded-2xl border border-neutral-800/90 bg-neutral-900/85 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+        {/* Acento decorativo naranja superior */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-600 via-orange-500 to-neutral-800" />
+
+        {/* Encabezado del Formulario */}
+        <div className="mb-6 border-b border-neutral-800 pb-5">
+          <h1 className="text-2xl font-extrabold tracking-tight text-white uppercase">
+            Alta de Producto / Servicio
+          </h1>
+          <p className="text-base text-neutral-400 mt-1">
+            Registra una nueva pieza, recambio o concepto de mano de obra
+          </p>
         </div>
-    );
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Campo Nombre del Artículo */}
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+            >
+              Descripción / Nombre del Artículo *
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              placeholder="Ej. Kit Arrastre RK 525, Cambio de Aceite 10W40, etc."
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
+            />
+          </div>
+
+          {/* Campo Precio Unitario */}
+          <div>
+            <label
+              htmlFor="unitPrice"
+              className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+            >
+              Precio Unitario (€ IVA incluido) *
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                id="unitPrice"
+                name="unitPrice"
+                required
+                placeholder="0.00"
+                value={formData.unitPrice}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 py-3 pl-4 pr-10 text-sm font-mono text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
+              />
+              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 font-mono text-sm font-bold text-neutral-400">
+                €
+              </span>
+            </div>
+          </div>
+
+          {/* Toggle / Checkbox de Disponibilidad en Stock */}
+          <div className="rounded-xl border border-neutral-800 bg-neutral-950/70 p-4">
+            <label
+              htmlFor="inStock"
+              className="flex items-center justify-between cursor-pointer"
+            >
+              <div>
+                <span className="block text-sm font-bold text-white">
+                  Disponible en Stock
+                </span>
+                <span className="block text-base text-neutral-400 mt-0.5">
+                  Marca si el producto cuenta con unidades físicas listas en el almacén
+                </span>
+              </div>
+              <input
+                type="checkbox"
+                id="inStock"
+                name="inStock"
+                checked={formData.inStock}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, inStock: e.target.checked }))
+                }
+                className="h-5 w-5 rounded border-neutral-700 bg-neutral-900 text-orange-600 focus:ring-orange-500 focus:ring-offset-neutral-950 accent-orange-500 cursor-pointer"
+              />
+            </label>
+          </div>
+
+          {/* Mensaje de Error */}
+          {error && (
+            <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-950/60 p-3.5 text-base font-medium text-red-300 animate-in fade-in duration-200">
+              <svg
+                className="h-4 w-4 flex-shrink-0 text-red-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Botones de Acción */}
+          <div className="pt-2 flex flex-col-reverse sm:flex-row items-center gap-3">
+            <Link
+              to="/items"
+              className="w-full sm:w-auto text-center rounded-xl border border-neutral-700 bg-neutral-900 px-5 py-3 text-base font-bold text-neutral-300 transition-colors hover:bg-neutral-800 hover:text-white"
+            >
+              Cancelar
+            </Link>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full flex-1 flex items-center justify-center gap-2 rounded-xl bg-orange-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-orange-600/30 transition-all duration-200 hover:bg-orange-500 hover:shadow-orange-600/40 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  <span>Guardando en catálogo...</span>
+                </>
+              ) : (
+                <span>Guardar artículo</span>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 export default ItemCreate;
