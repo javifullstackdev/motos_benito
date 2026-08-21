@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import apiFetch from "../api/client";
+import { normalizeInputValue } from "../utils/formatting";
 
 function ItemCreate() {
   const navigate = useNavigate();
@@ -12,11 +13,12 @@ function ItemCreate() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  function handleChange(
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) {
+  function handleChange(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+        ...prev,
+        [name]: normalizeInputValue(event.target, value),
+    }));
   }
 
   async function handleSubmit(event: React.FormEvent) {

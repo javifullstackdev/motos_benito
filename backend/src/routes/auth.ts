@@ -29,6 +29,7 @@ router.post("/login", async (req, res) => {
             lastName2: user.lastName2,
             email: user.email,
             active: user.active,
+            nationalId: user.nationalId,
         },
     });
 });
@@ -53,6 +54,7 @@ router.get("/me", requireAuth, async (req, res) => {
             lastName2: true,
             email: true,
             active: true,
+            nationalId: true,
         },
     });
     res.json({ user });

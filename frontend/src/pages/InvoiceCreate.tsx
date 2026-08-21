@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiFetch from "../api/client";
+import { useAuth } from "../context/AuthContext";
+import TypeToConfirmDialog from "../components/TypeToConfirmDialog";
 
 type Workshop = {
   workshopId: number;
@@ -39,6 +41,8 @@ function InvoiceCreate() {
   } | null>(null);
 
   const selectedCustomer = customers.find((customer) => customer.name === customerSearch);
+  const { employee } = useAuth();
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   useEffect(() => {
     apiFetch("/api/workshops")
@@ -72,7 +76,7 @@ function InvoiceCreate() {
     return acc + (item ? item.unitPrice * (line.quantity || 0) : 0);
   }, 0);
 
-  async function handleSubmit(event: React.FormEvent) {
+  function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError("");
 
@@ -96,6 +100,19 @@ function InvoiceCreate() {
       return;
     }
 
+    setIsConfirmOpen(true);
+  }
+
+async function handleConfirmedCreate() {
+    if (!selectedCustomer) {
+      return;
+    }
+
+    const resolvedLines = lines.map((line) => {
+      const item = items.find((i) => i.name === line.itemSearch);
+      return { itemId: item?.itemId, quantity: line.quantity };
+    });
+
     setIsLoading(true);
 
     try {
@@ -108,8 +125,10 @@ function InvoiceCreate() {
         }),
       });
       setCreatedInvoice(data.invoice);
+      setIsConfirmOpen(false);
     } catch (err) {
       setError((err as Error).message);
+      setIsConfirmOpen(false);
     } finally {
       setIsLoading(false);
     }
@@ -376,6 +395,18 @@ function InvoiceCreate() {
           </form>
         </div>
       )}
+
+<TypeToConfirmDialog
+        isOpen={isConfirmOpen}
+        title="Confirmar emisión de factura"
+        message={`¿Estás seguro de que deseas generar la factura para "${selectedCustomer?.name}"? No podrás deshacer esta acción.`}
+        inputLabel="Escribe tu DNI para confirmar"
+        expectedValue={employee?.nationalId ?? ""}
+        confirmLabel="Generar factura"
+        isLoading={isLoading}
+        onConfirm={handleConfirmedCreate}
+        onCancel={() => setIsConfirmOpen(false)}
+      />
     </div>
   );
 }

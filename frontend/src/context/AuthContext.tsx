@@ -8,6 +8,7 @@ type Employee = {
     lastName2: string;
     email: string;
     active: boolean;
+    nationalId: string;
 }
 
 type AuthContextType = {

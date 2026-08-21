@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import apiFetch from "../api/client";
+import { normalizeInputValue } from "../utils/formatting";
+import { isValidSpanishTaxId } from "../utils/taxId";
 
 function CustomerCreate() {
   const navigate = useNavigate();
@@ -21,16 +23,23 @@ function CustomerCreate() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  function handleChange(
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) {
+  function handleChange(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+        ...prev,
+        [name]: normalizeInputValue(event.target, value),
+    }));
   }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError("");
+    
+    if(!isValidSpanishTaxId(formData.taxId)) {
+      setError("El NIF/CIF/NIE no es válido");
+      return;
+    }
+
     setIsLoading(true);
 
     try {

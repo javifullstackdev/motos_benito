@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import apiFetch from "../api/client";
+import { normalizeInputValue } from "../utils/formatting";
+import ConfirmDialog from "../components/ConfirmDialog";
 
 function ItemDetail() {
   const { id } = useParams();
@@ -15,6 +17,8 @@ function ItemDetail() {
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     setIsFetching(true);
@@ -32,11 +36,12 @@ function ItemDetail() {
       .finally(() => setIsFetching(false));
   }, [id]);
 
-  function handleChange(
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) {
+  function handleChange(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+        ...prev,
+        [name]: normalizeInputValue(event.target, value),
+    }));
   }
 
   async function handleSubmit(event: React.FormEvent) {
@@ -61,6 +66,19 @@ function ItemDetail() {
       setError((err as Error).message);
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleDelete() {
+    setIsDeleting(true);
+    try {
+        await apiFetch(`/api/items/${id}`, { method: "DELETE" });
+        navigate("/items");
+    } catch (err) {
+        setError((err as Error).message);
+        setIsConfirmOpen(false);
+    } finally {
+        setIsDeleting(false);
     }
   }
 
@@ -259,6 +277,23 @@ function ItemDetail() {
                 <span>Guardar cambios</span>
               )}
             </button>
+            <button
+              type="button"
+              onClick={() => setIsConfirmOpen(true)}
+              disabled={isDeleting}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-red-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-red-600/30 transition-all duration-200 hover:bg-red-500 hover:shadow-red-600/40 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isDeleting ? "Eliminando..." : "Eliminar artículo"}
+            </button>
+            <ConfirmDialog
+              isOpen={isConfirmOpen}
+              title="Eliminar producto"
+              message="¿Estás seguro de querer eliminar este producto? Esta acción no se puede deshacer."
+              confirmLabel="Eliminar"
+              isLoading={isDeleting}
+              onConfirm={handleDelete}
+              onCancel={() => setIsConfirmOpen(false)}
+            />
           </div>
         </form>
       </div>

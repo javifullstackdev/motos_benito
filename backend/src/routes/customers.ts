@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma";
 import { requireAuth } from "../middleware/requireAuth";
+import { Prisma } from "../generated/prisma/client";
 
 const router = Router();
 
@@ -23,17 +24,31 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    const customer = await prisma.customer.create({ data: req.body });
-    res.status(201).json({ customer });
+    try {
+        const customer = await prisma.customer.create({ data: req.body });
+        res.status(201).json({ customer });
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+            return res.status(409).json({ error: "Ya existe un cliente registrado con ese NIF/CIF/NIE" });
+        }
+        res.status(500).json({ error: "Error al crear el cliente" });
+    }
 });
 
 router.put("/:id", async (req, res) => {
     const id = Number(req.params.id);
-    const customer = await prisma.customer.update({ 
-        where: { customerId: id }, 
-        data: req.body 
-    });
-    res.json({ customer });
+    try {
+        const customer = await prisma.customer.update({
+            where: { customerId: id },
+            data: req.body,
+        });
+        res.json({ customer });
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+            return res.status(409).json({ error: "Ya existe un cliente registrado con ese NIF/CIF/NIE" });
+        }
+        res.status(500).json({ error: "Error al actualizar el cliente" });
+    }
 });
 
 router.delete("/:id", async (req, res) => {

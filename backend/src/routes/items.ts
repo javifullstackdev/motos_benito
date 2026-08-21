@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma";
 import { requireAuth } from "../middleware/requireAuth";
+import { Prisma } from "../generated/prisma/client";
 
 const router = Router();
 
@@ -26,25 +27,38 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    const item = await prisma.item.create({
-        data: req.body,
-    })
-
-    res.status(201).json({ item });
-})
+    try {
+        const item = await prisma.item.create({
+            data: req.body,
+        });
+        res.status(201).json({ item });
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+            return res.status(409).json({ error: "Ya existe un producto con ese nombre" });
+        }
+        res.status(500).json({ error: "Error al crear el producto" });
+    }
+});
 
 router.put("/:id", async (req, res) => {
     const id = Number(req.params.id);
 
     try {
         const item = await prisma.item.update({
-        where: { itemId: id },
-        data: req.body,
-    });
-
-    res.json({ item });
+            where: { itemId: id },
+            data: req.body,
+        });
+        res.json({ item });
     } catch (error) {
-        res.status(404).json({ error: "Articulo no encontrado" });
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2002") {
+                return res.status(409).json({ error: "Ya existe un producto con ese nombre" });
+            }
+            if (error.code === "P2025") {
+                return res.status(404).json({ error: "Producto no encontrado" });
+            }
+        }
+        res.status(500).json({ error: "Error al actualizar el producto" });
     }
 });
 
