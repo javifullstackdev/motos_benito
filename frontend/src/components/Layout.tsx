@@ -40,7 +40,7 @@ function Layout({ children }: { children: React.ReactNode }) {
           {/* Logo Superior */}
           <Link
             to="/"
-            className="flex items-center justify-center p-2 rounded-xl bg-neutral-950/60 border border-neutral-800/80 transition-transform hover:scale-[1.02]"
+            className="flex items-center justify-center p-2 rounded-xl transition-transform hover:scale-[1.02]"
           >
             <img
               src={logoNav}
@@ -51,7 +51,7 @@ function Layout({ children }: { children: React.ReactNode }) {
 
           {/* Menú de Navegación Vertical */}
           <nav className="flex flex-col gap-2">
-            <div className="px-3 pb-1 text-sm font-bold uppercase tracking-wider text-neutral-400">
+            <div className="px-3 pb-1 text-base font-bold uppercase tracking-wider text-orange-500">
               Gestión Taller
             </div>
 

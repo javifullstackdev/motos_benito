@@ -34,19 +34,6 @@ function Login() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-[#0B0D0F] px-4 py-12 text-neutral-200 overflow-hidden select-none">
-      
-      {/* 1. Malla de fondo sutil estilo Motorsport / Garage */}
-      <div 
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)`,
-          backgroundSize: '32px 32px'
-        }}
-      />
-
-      {/* 2. Resplandores ambientales estratégicos */}
-      <div className="pointer-events-none absolute -top-32 left-1/2 h-[450px] w-[450px] -translate-x-1/2 rounded-full bg-orange-600/15 blur-[140px]" />
-      <div className="pointer-events-none absolute -bottom-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-neutral-800/40 blur-[100px]" />
 
       <div className="relative z-10 w-full max-w-md">
         
@@ -67,14 +54,10 @@ function Login() {
 
           {/* Encabezado */}
           <div className="mb-7 text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-800 bg-neutral-950/80 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-orange-500 mb-2.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-orange-500 animate-pulse" />
-              Terminal Taller
-            </span>
             <h1 className="text-xl font-extrabold tracking-tight text-white uppercase">
               Acceso al Sistema
             </h1>
-            <p className="mt-1 text-xs text-neutral-400">
+            <p className="mt-1 text-base text-neutral-400">
               Introduce tus credenciales para gestionar el taller
             </p>
           </div>
@@ -85,7 +68,7 @@ function Login() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-xs font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
               >
                 Email
               </label>
@@ -111,7 +94,7 @@ function Login() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-xs font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
+                className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5"
               >
                 Contraseña
               </label>
@@ -152,7 +135,7 @@ function Login() {
 
             {/* Mensaje de Error */}
             {error && (
-              <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-950/60 p-3 text-xs font-medium text-red-300 animate-in fade-in duration-200">
+              <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-950/60 p-3 text-base font-medium text-red-300 animate-in fade-in duration-200">
                 <svg className="h-4 w-4 flex-shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -164,7 +147,7 @@ function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl bg-orange-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-orange-600/30 transition-all duration-200 hover:bg-orange-500 hover:shadow-orange-600/40 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-orange-600"
+              className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl bg-orange-600 px-4 py-3 text-base font-bold text-white shadow-lg shadow-orange-600/30 transition-all duration-200 hover:bg-orange-500 hover:shadow-orange-600/40 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-orange-600"
             >
               {isLoading ? (
                 <>

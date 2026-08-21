@@ -4,7 +4,7 @@ import { Prisma } from "../generated/prisma/client";
 import { requireAuth } from "../middleware/requireAuth";
 import crypto from "crypto";
 import QRCode from "qrcode";
-import { generatePdf, buildInvoiceHtml } from "../lib/pdf";
+import { generatePdf, buildInvoiceHtml, buildQuarterlyReportHtml } from "../lib/pdf";
 
 const router = Router();
 
@@ -21,6 +21,39 @@ function calculateHash(previousHash: string, data: string): string {
 async function generateInvoiceQr(invoice: any): Promise<string> {
     const qrContent = `NIF:${invoice.employee.nationalId}|NUM:${invoice.invoiceNumber}|FECHA:${invoice.issueDate}|IMPORTE:${invoice.total}`;
     return await QRCode.toDataURL(qrContent);
+}
+
+function getQuarterDateRange(year: number, quarter: number): { start: Date; end: Date } {
+    const startMonth = (quarter - 1) * 3;
+    const start = new Date(year, startMonth, 1);
+    const end = new Date(year, startMonth + 3, 1);
+    return { start, end };
+}
+
+async function getQuarterlyReportData(employeeId: number, year: number, quarter: number) {
+    const { start, end } = getQuarterDateRange(year, quarter);
+
+    const invoices = await prisma.invoice.findMany({
+        where: {
+            emplId: employeeId,
+            issueDate: { gte: start, lt: end },
+        },
+        include: {
+            customer: { select: { customerId: true, name: true } },
+        },
+        orderBy: { invoiceNumber: "asc" },
+    });
+
+    const summary = invoices.reduce(
+        (acc, invoice) => ({
+            subtotal: acc.subtotal.plus(invoice.subtotal),
+            taxAmount: acc.taxAmount.plus(invoice.taxAmount),
+            total: acc.total.plus(invoice.total),
+        }),
+        { subtotal: new Prisma.Decimal(0), taxAmount: new Prisma.Decimal(0), total: new Prisma.Decimal(0) }
+    );
+
+    return { invoices, summary };
 }
 
 async function createInvoiceWithRetry(
@@ -140,6 +173,51 @@ router.post("/", async (req, res) => {
     const invoice = await createInvoiceWithRetry(employee, workshopId, customerId, resolvedLines);
 
     res.status(201).json({ invoice });
+});
+
+router.get("/quarterly-report", async (req, res) => {
+    const employeeId = Number(req.query.employeeId);
+    const year = Number(req.query.year);
+    const quarter = Number(req.query.quarter);
+
+    if (!employeeId || !year || quarter < 1 || quarter > 4) {
+        return res.status(400).json({ error: "Parámetros inválidos" });
+    }
+
+    const { invoices, summary } = await getQuarterlyReportData(employeeId, year, quarter);
+
+    res.json({
+        invoices,
+        summary: {
+            count: invoices.length,
+            subtotal: summary.subtotal,
+            taxAmount: summary.taxAmount,
+            total: summary.total,
+        },
+    });
+});
+
+router.get("/quarterly-report/pdf", async (req, res) => {
+    const employeeId = Number(req.query.employeeId);
+    const year = Number(req.query.year);
+    const quarter = Number(req.query.quarter);
+
+    if (!employeeId || !year || quarter < 1 || quarter > 4) {
+        return res.status(400).json({ error: "Parámetros inválidos" });
+    }
+
+    const employee = await prisma.employee.findUnique({ where: { emplId: employeeId } });
+    if (!employee) {
+        return res.status(404).json({ error: "Empleado no encontrado" });
+    }
+
+    const { invoices, summary } = await getQuarterlyReportData(employeeId, year, quarter);
+
+    const html = buildQuarterlyReportHtml(employee, year, quarter, invoices, summary);
+    const pdfBuffer = await generatePdf(html);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.send(pdfBuffer);
 });
 
 router.get("/:id/qr", async (req, res) => {

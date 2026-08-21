@@ -3,6 +3,12 @@ import { Link } from "react-router-dom";
 import apiFetch from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import TypeToConfirmDialog from "../components/TypeToConfirmDialog";
+import Card from "../components/ui/Card";
+import FormLabel from "../components/ui/FormLabel";
+import TextInput from "../components/ui/TextInput";
+import Select from "../components/ui/Select";
+import Button from "../components/ui/Button";
+import Alert from "../components/ui/Alert";
 
 type Workshop = {
   workshopId: number;
@@ -26,7 +32,6 @@ type LineInput = {
 };
 
 function InvoiceCreate() {
-
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [items, setItems] = useState<Item[]>([]);
@@ -103,7 +108,7 @@ function InvoiceCreate() {
     setIsConfirmOpen(true);
   }
 
-async function handleConfirmedCreate() {
+  async function handleConfirmedCreate() {
     if (!selectedCustomer) {
       return;
     }
@@ -148,9 +153,7 @@ async function handleConfirmedCreate() {
 
       {/* Pantalla de Éxito / Factura Creada */}
       {createdInvoice ? (
-        <div className="relative overflow-hidden rounded-2xl border border-neutral-800/90 bg-neutral-900/85 p-8 text-center shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-orange-500 to-neutral-800" />
-          
+        <Card accent="emerald" className="p-8 text-center animate-in fade-in zoom-in-95 duration-200">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-400">
             <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -181,24 +184,22 @@ async function handleConfirmedCreate() {
               <span>Descargar PDF Oficial</span>
             </a>
 
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={() => {
                 setCreatedInvoice(null);
                 setCustomerSearch("");
                 setLines([{ itemSearch: "", quantity: 1 }]);
               }}
-              className="w-full sm:w-auto rounded-xl border border-neutral-700 bg-neutral-900 px-6 py-3 text-sm font-bold text-neutral-200 transition-colors hover:bg-neutral-800 hover:text-white"
             >
               Emitir otra factura
-            </button>
+            </Button>
           </div>
-        </div>
+        </Card>
       ) : (
         /* Formulario Principal de Creación */
-        <div className="relative overflow-hidden rounded-2xl border border-neutral-800/90 bg-neutral-900/85 p-6 sm:p-9 shadow-2xl backdrop-blur-xl">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-600 via-orange-500 to-neutral-800" />
-
+        <Card className="p-6 sm:p-9">
           {/* Encabezado */}
           <div className="mb-8 border-b border-neutral-800 pb-5">
             <h1 className="text-2xl font-extrabold tracking-tight text-white uppercase">
@@ -210,7 +211,6 @@ async function handleConfirmedCreate() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
-            
             {/* SECCIÓN 1: DATOS CABECERA (TALLER Y CLIENTE) */}
             <div>
               <h2 className="text-base font-bold uppercase tracking-wider text-orange-500 mb-4 flex items-center gap-2">
@@ -220,14 +220,11 @@ async function handleConfirmedCreate() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5">
-                    Taller Emisor *
-                  </label>
-                  <select
+                  <FormLabel>Taller Emisor *</FormLabel>
+                  <Select
                     value={workshopId}
                     onChange={(e) => setWorkshopId(e.target.value)}
                     required
-                    className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500 cursor-pointer"
                   >
                     <option value="">Selecciona un taller...</option>
                     {workshops.map((workshop) => (
@@ -235,21 +232,18 @@ async function handleConfirmedCreate() {
                         {workshop.name}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </div>
 
                 <div>
-                  <label className="block text-base font-bold uppercase tracking-wider text-neutral-300 mb-1.5">
-                    Cliente Receptor *
-                  </label>
+                  <FormLabel>Cliente Receptor *</FormLabel>
                   <div className="relative">
-                    <input
+                    <TextInput
                       list="customer-options"
                       value={customerSearch}
                       onChange={(e) => setCustomerSearch(e.target.value)}
                       required
                       placeholder="Buscar por nombre de cliente..."
-                      className="w-full rounded-xl border border-neutral-800 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:bg-black focus:outline-none focus:ring-1 focus:ring-orange-500"
                     />
                     <datalist id="customer-options">
                       {customers.map((customer) => (
@@ -291,29 +285,28 @@ async function handleConfirmedCreate() {
                     >
                       {/* Buscador de artículo con datalist */}
                       <div className="flex-1 w-full">
-                        <input
+                        <TextInput
                           list="item-options"
                           value={line.itemSearch}
                           onChange={(e) => updateLine(index, "itemSearch", e.target.value)}
                           placeholder="Buscar producto o servicio..."
-                          className="w-full rounded-lg border border-neutral-800 bg-neutral-900/90 px-3.5 py-2.5 text-base text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                         />
                       </div>
 
                       {/* Cantidad */}
                       <div className="w-24 flex-shrink-0">
-                        <input
+                        <TextInput
                           type="number"
                           value={line.quantity}
                           onChange={(e) => updateLine(index, "quantity", Number(e.target.value))}
                           min={1}
-                          className="w-full text-center font-mono rounded-lg border border-neutral-800 bg-neutral-900/90 px-2 py-2.5 textbase text-white focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                          className="text-center font-mono"
                         />
                       </div>
 
                       {/* Precio Unitario / Subtotal dinámico */}
                       <div className="w-32 flex-shrink-0 text-right font-mono">
-                        <span className="textbase font-bold text-orange-500 block">
+                        <span className="text-base font-bold text-orange-500 block">
                           {subtotal.toFixed(2)} €
                         </span>
                         <span className="text-sm text-neutral-500 block">
@@ -359,14 +352,7 @@ async function handleConfirmedCreate() {
             </div>
 
             {/* Mensaje de Error */}
-            {error && (
-              <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-950/60 p-3.5 text-base font-medium text-red-300 animate-in fade-in duration-200">
-                <svg className="h-4 w-4 flex-shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{error}</span>
-              </div>
-            )}
+            {error && <Alert variant="error">{error}</Alert>}
 
             {/* Botones de Acción */}
             <div className="pt-4 border-t border-neutral-800/80 flex flex-col-reverse sm:flex-row items-center justify-end gap-3">
@@ -377,26 +363,15 @@ async function handleConfirmedCreate() {
                 Cancelar
               </Link>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-orange-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-orange-600/30 transition-all duration-200 hover:bg-orange-500 hover:shadow-orange-600/40 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <>
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                    <span>Generando factura...</span>
-                  </>
-                ) : (
-                  <span>Emitir factura y generar PDF</span>
-                )}
-              </button>
+              <Button type="submit" isLoading={isLoading} loadingText="Generando factura...">
+                Emitir factura y generar PDF
+              </Button>
             </div>
           </form>
-        </div>
+        </Card>
       )}
 
-<TypeToConfirmDialog
+      <TypeToConfirmDialog
         isOpen={isConfirmOpen}
         title="Confirmar emisión de factura"
         message={`¿Estás seguro de que deseas generar la factura para "${selectedCustomer?.name}"? No podrás deshacer esta acción.`}

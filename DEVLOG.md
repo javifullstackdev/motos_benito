@@ -256,3 +256,20 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - **Borrado de clientes y artículos**: nuevo componente reutilizable `ConfirmDialog.tsx` (modal de sí/no con el estilo visual de la app), conectado a nuevos botones "Eliminar" en `CustomerDetail.tsx` e `ItemDetail.tsx`, usando las rutas `DELETE` que ya existían en el backend desde la Fase 4.
 - **Confirmación de facturación con DNI**: nuevo componente `TypeToConfirmDialog.tsx` — antes de generar una factura, se pide al empleado que escriba su propio DNI para confirmar la acción, comparándolo contra `employee.nationalId` (campo añadido ahora a las respuestas de `/api/auth/login` y `/api/auth/me`, que antes no lo exponían). El botón de confirmar permanece deshabilitado mientras el texto no coincide exactamente, con una comprobación explícita para que un campo vacío nunca pueda "colar" como válido.
 - **Probado**: NIF inválido bloquea el alta de cliente; borrado de cliente/artículo sin facturas asociadas funciona, y con facturas asociadas muestra el mensaje de conflicto; factura solo se genera tras escribir el DNI correcto del empleado logueado.
+
+
+## 2026-08-21 — Sistema de diseño reutilizable y refactor visual
+
+- Extraídos los patrones visuales repetidos por toda la app a componentes reutilizables en `frontend/src/components/ui/`: `Card`, `FormLabel`, `TextInput`, `Select`, `Button` (con variantes primary/secondary/danger y estado de carga integrado), `Alert` (error/éxito) y `Badge`.
+- Migrados todos los formularios existentes (`CustomerCreate`, `CustomerDetail`, `ItemCreate`, `ItemDetail`, `InvoiceCreate`) para usar estos componentes en vez de repetir las mismas cadenas de clases de Tailwind en cada archivo.
+- Estandarizado el tamaño de las etiquetas de formulario (`text-base` en todos los formularios; antes había una mezcla de `text-xs`/`text-base` según la pantalla).
+- Ocultadas las flechas nativas de incremento/decremento de los inputs numéricos (`type="number"`), que no seguían el tema oscuro de la app — regla CSS global añadida en `index.css`.
+
+
+## 2026-08-21 — Informe trimestral de IVA
+
+- Nuevo endpoint `GET /api/employees` (listado simple de empleados activos, no existía hasta ahora).
+- Dos rutas nuevas en `invoices.ts`: `GET /api/invoices/quarterly-report` (resumen en JSON, para mostrar en pantalla) y `GET /api/invoices/quarterly-report/pdf` (informe descargable), ambas filtrando por empleado + trimestre/año — imprescindible que sea por empleado, ya que Fernando y David declaran el IVA cada uno por separado al ser autónomos independientes sin CIF conjunto.
+- Nueva plantilla de PDF (`buildQuarterlyReportHtml`) con el listado de facturas del periodo y los totales de base imponible, IVA repercutido y total facturado, con el mismo estilo visual que las facturas individuales.
+- **Alcance deliberadamente limitado**: el informe solo cubre el IVA repercutido (facturas emitidas) — la app no registra gastos ni compras del taller, así que no sustituye la preparación completa del Modelo 303, que también necesita el IVA soportado.
+- Añadida una tarjeta nueva en el Dashboard con selector de empleado/trimestre/año, resumen en pantalla y botón de descarga del PDF.

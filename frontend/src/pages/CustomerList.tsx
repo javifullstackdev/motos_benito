@@ -42,21 +42,21 @@ function CustomerList() {
       {/* Cabecera con título y contador */}
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-neutral-800 pb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white uppercase">
-            Directorio de Clientes
+          <h1 className="text-2xl font-bold tracking-tight text-white uppercase">
+            Clientes
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+          <p className="text-base sm:text-sm text-neutral-400 mt-1">
             Gestión de fichas de clientes y vehículos asociados
           </p>
         </div>
 
         <div className="flex items-center justify-between sm:justify-end gap-3">
-          <span className="rounded-full border border-neutral-800 bg-neutral-900/90 px-3.5 py-1.5 text-xs sm:text-sm font-medium text-neutral-300">
+          <span className="rounded-full border border-neutral-800 bg-neutral-900/90 px-3.5 py-1.5 text-base sm:text-sm font-medium text-neutral-300">
             Total: <strong className="text-white font-bold">{filteredCustomers.length}</strong>
           </span>
           <Link
             to="/customers/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg shadow-orange-600/25 transition-all hover:bg-orange-500 active:scale-[0.99]"
+            className="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 sm:px-5 py-2.5 text-base sm:text-sm font-bold text-white shadow-lg shadow-orange-600/25 transition-all hover:bg-orange-500 active:scale-[0.99]"
           >
             <span>+ Nuevo cliente</span>
           </Link>
@@ -76,7 +76,7 @@ function CustomerList() {
             placeholder="Buscar por nombre, NIF/CIF, teléfono o email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-lg border border-neutral-800 bg-neutral-950/90 py-2.5 sm:py-3 pl-11 pr-4 text-xs sm:text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+            className="w-full rounded-lg border border-neutral-800 bg-neutral-950/90 py-2.5 sm:py-3 pl-11 pr-4 text-base sm:text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
           />
         </div>
       </div>
@@ -103,13 +103,13 @@ function CustomerList() {
                   ID: #{customer.customerId}
                 </span>
               </div>
-              <span className="font-mono text-xs rounded bg-neutral-950 px-2 py-1 border border-neutral-800 text-neutral-300">
+              <span className="font-mono text-base rounded bg-neutral-950 px-2 py-1 border border-neutral-800 text-neutral-300">
                 {customer.taxId || "S/N"}
               </span>
             </div>
 
             {/* Datos de contacto y acciones táctiles */}
-            <div className="py-3 flex flex-col gap-2 text-xs">
+            <div className="py-3 flex flex-col gap-2 text-base">
               {/* Teléfono con botón de llamada rápida */}
               <div className="flex items-center justify-between">
                 <span className="text-neutral-500">Teléfono:</span>
@@ -158,7 +158,7 @@ function CustomerList() {
         ))}
 
         {filteredCustomers.length === 0 && (
-          <div className="rounded-2xl border border-neutral-800 bg-neutral-900/80 p-8 text-center text-xs text-neutral-400 italic">
+          <div className="rounded-2xl border border-neutral-800 bg-neutral-900/80 p-8 text-center text-base text-neutral-400 italic">
             No se encontraron clientes.
           </div>
         )}
@@ -171,7 +171,7 @@ function CustomerList() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-neutral-800 bg-neutral-950/80 text-xs font-bold uppercase tracking-wider text-neutral-300">
+              <tr className="border-b border-neutral-800 bg-neutral-950/80 text-base font-bold uppercase tracking-wider text-neutral-300">
                 <th className="px-6 py-4">Cliente</th>
                 <th className="px-6 py-4">NIF / CIF</th>
                 <th className="px-6 py-4">Teléfono</th>
@@ -194,7 +194,7 @@ function CustomerList() {
                     </Link>
                   </td>
                   <td className="px-6 py-4 font-mono">
-                    <span className="rounded bg-neutral-950/80 px-2.5 py-1 border border-neutral-800 text-xs text-neutral-200">
+                    <span className="rounded bg-neutral-950/80 px-2.5 py-1 border border-neutral-800 text-base text-neutral-200">
                       {customer.taxId || "—"}
                     </span>
                   </td>
@@ -225,7 +225,7 @@ function CustomerList() {
                   <td className="px-6 py-4 text-right">
                     <Link
                       to={`/customers/${customer.customerId}`}
-                      className="inline-flex items-center rounded-md border border-neutral-700 bg-neutral-800/90 px-3 py-1.5 text-xs font-semibold text-neutral-200 transition-colors hover:border-orange-500 hover:text-orange-400"
+                      className="inline-flex items-center rounded-md border border-neutral-700 bg-neutral-800/90 px-3 py-1.5 text-base font-semibold text-neutral-200 transition-colors hover:border-orange-500 hover:text-orange-400"
                     >
                       Ver ficha →
                     </Link>

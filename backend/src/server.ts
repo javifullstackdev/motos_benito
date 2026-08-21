@@ -10,6 +10,7 @@ import itemsRoutes from "./routes/items";
 import invoicesRoutes from "./routes/invoices";
 import workshopsRoutes from "./routes/workshops";
 import statsRoutes from "./routes/stats";
+import employeesRoutes from "./routes/employees";
 
 const app = express();
 
@@ -55,6 +56,7 @@ app.use("/api/items", itemsRoutes);
 app.use("/api/invoices", invoicesRoutes);
 app.use("/api/workshops", workshopsRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/employees", employeesRoutes);
 
 declare module "express-session" {
     interface SessionData {

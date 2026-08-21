@@ -38,21 +38,21 @@ function InvoiceList() {
       {/* Cabecera con título, métrica y acción */}
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-neutral-800 pb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white uppercase">
-            Registro de Facturas
+          <h1 className="text-2xl font-bold tracking-tight text-white uppercase">
+            Listado de Facturas
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+          <p className="text-base sm:text-sm text-neutral-400 mt-1">
             Histórico contable, facturación por cliente y exportación de documentos
           </p>
         </div>
 
         <div className="flex items-center justify-between sm:justify-end gap-3">
-          <span className="rounded-full border border-neutral-800 bg-neutral-900/90 px-3.5 py-1.5 text-xs sm:text-sm font-medium text-neutral-400">
+          <span className="rounded-full border border-neutral-800 bg-neutral-900/90 px-3.5 py-1.5 text-base sm:text-sm font-medium text-neutral-400">
             Total emitidas: <strong className="text-white">{filteredInvoices.length}</strong>
           </span>
           <Link
             to="/invoices/new"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-orange-600 px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg shadow-orange-600/25 transition-all hover:bg-orange-500 active:scale-[0.99]"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-orange-600 px-4 sm:px-5 py-2.5 text-base sm:text-sm font-bold text-white shadow-lg shadow-orange-600/25 transition-all hover:bg-orange-500 active:scale-[0.99]"
           >
             <span>+ Nueva factura</span>
           </Link>
@@ -72,7 +72,7 @@ function InvoiceList() {
             placeholder="Buscar por nº factura, cliente, taller, mecánico o fecha..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-lg border border-neutral-800 bg-neutral-950/90 py-2.5 sm:py-3 pl-10 pr-4 text-xs sm:text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+            className="w-full rounded-lg border border-neutral-800 bg-neutral-950/90 py-2.5 sm:py-3 pl-10 pr-4 text-base sm:text-sm text-white placeholder-neutral-500 transition-all focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
           />
         </div>
       </div>
@@ -89,7 +89,7 @@ function InvoiceList() {
             {/* Fila superior: Nº Factura + Importe en 2 líneas protegidas */}
             <div className="flex items-start justify-between gap-3 border-b border-neutral-800/70 pb-3">
               <div>
-                <span className="inline-block font-mono text-xs font-bold text-white rounded-lg bg-neutral-950 px-2.5 py-1 border border-neutral-800">
+                <span className="inline-block font-mono text-base font-bold text-white rounded-lg bg-neutral-950 px-2.5 py-1 border border-neutral-800">
                   {invoice.invoiceNumber}
                 </span>
                 <span className="block mt-1 text-[11px] font-mono text-neutral-500">
@@ -109,7 +109,7 @@ function InvoiceList() {
             </div>
 
             {/* Datos del receptor y emisor */}
-            <div className="py-3 flex flex-col gap-1.5 text-xs">
+            <div className="py-3 flex flex-col gap-1.5 text-base">
               <div className="flex items-center justify-between">
                 <span className="text-neutral-500">Cliente:</span>
                 <span className="font-bold text-white text-right truncate max-w-[210px]">
@@ -139,7 +139,7 @@ function InvoiceList() {
                 target="_blank"
                 rel="noreferrer"
                 download={`factura-${invoice.invoiceNumber}.pdf`}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-neutral-800/90 border border-neutral-700 py-2.5 text-xs font-bold text-neutral-200 transition-colors hover:border-orange-500 hover:text-orange-400"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-neutral-800/90 border border-neutral-700 py-2.5 text-base font-bold text-neutral-200 transition-colors hover:border-orange-500 hover:text-orange-400"
               >
                 <svg className="h-4 w-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -151,7 +151,7 @@ function InvoiceList() {
         ))}
 
         {filteredInvoices.length === 0 && (
-          <div className="rounded-2xl border border-neutral-800 bg-neutral-900/80 p-8 text-center text-xs text-neutral-400 italic">
+          <div className="rounded-2xl border border-neutral-800 bg-neutral-900/80 p-8 text-center text-base text-neutral-400 italic">
             No se encontraron facturas registradas con ese criterio.
           </div>
         )}
@@ -164,7 +164,7 @@ function InvoiceList() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-neutral-800 bg-neutral-950/60 text-xs font-bold uppercase tracking-wider text-neutral-400">
+              <tr className="border-b border-neutral-800 bg-neutral-950/60 text-base font-bold uppercase tracking-wider text-neutral-400">
                 <th className="px-5 py-4">Nº Factura</th>
                 <th className="px-5 py-4">Cliente</th>
                 <th className="px-5 py-4">Taller / Empleado</th>
@@ -177,7 +177,7 @@ function InvoiceList() {
               {filteredInvoices.map((invoice) => (
                 <tr key={invoice.invoiceId} className="transition-colors hover:bg-neutral-800/40">
                   <td className="px-5 py-4">
-                    <span className="font-mono font-semibold text-white rounded bg-neutral-950/80 px-2.5 py-1 border border-neutral-800 text-xs">
+                    <span className="font-mono font-semibold text-white rounded bg-neutral-950/80 px-2.5 py-1 border border-neutral-800 text-base">
                       {invoice.invoiceNumber}
                     </span>
                   </td>
@@ -188,12 +188,12 @@ function InvoiceList() {
 
                   <td className="px-5 py-4">
                     <span className="text-neutral-300 block">{invoice.workshop.name}</span>
-                    <span className="text-xs text-neutral-500">
+                    <span className="text-base text-neutral-500">
                       Resp: {invoice.employee.firstName} {invoice.employee.lastName1}
                     </span>
                   </td>
 
-                  <td className="px-5 py-4 font-mono text-xs text-neutral-400">
+                  <td className="px-5 py-4 font-mono text-base text-neutral-400">
                     {invoice.issueDate}
                   </td>
 
@@ -207,7 +207,7 @@ function InvoiceList() {
                       target="_blank"
                       rel="noreferrer"
                       download={`factura-${invoice.invoiceNumber}.pdf`}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-700 bg-neutral-800/80 px-3 py-1.5 text-xs font-semibold text-neutral-200 transition-colors hover:border-orange-500 hover:text-orange-400"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-700 bg-neutral-800/80 px-3 py-1.5 text-base font-semibold text-neutral-200 transition-colors hover:border-orange-500 hover:text-orange-400"
                     >
                       <svg className="h-3.5 w-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

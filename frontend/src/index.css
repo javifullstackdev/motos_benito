@@ -10,3 +10,14 @@ input:-webkit-autofill:active {
   caret-color: #ffffff !important;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* Ocultar las flechas nativas de los inputs numéricos (no siguen el tema oscuro) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
