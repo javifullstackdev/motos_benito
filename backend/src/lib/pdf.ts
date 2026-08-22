@@ -71,11 +71,11 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string, workshops: any
     })
     .join("");
 
-  const workshopsHtml = workshops
+    const workshopsHtml = workshops
     .map(
       (w: any) => `
         <div class="workshop-entry">
-          <strong>${w.name}</strong> — ${w.streetType} ${w.streetName} ${w.streetNumber}, ${w.city} · ${w.phone}
+          <strong>${w.name}</strong> — ${w.streetType} ${w.streetName}, ${w.streetNumber} | ${w.phone}
         </div>
       `
     )
@@ -296,12 +296,20 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string, workshops: any
 
       .summary-section {
         display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
+        justify-content: flex-end;
         margin-bottom: 32px;
       }
 
+      .totals-column {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+      }
+
       .payment-method-badge {
+        width: 280px;
+        box-sizing: border-box;
         background-color: #f8fafc;
         border: 1px solid #e2e8f0;
         border-radius: 8px;
@@ -458,25 +466,27 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string, workshops: any
 
       <!-- Resumen de Importes -->
       <div class="summary-section">
-        <div class="payment-method-badge">
-          Forma de pago
-          <strong>${PAYMENT_METHOD_LABELS[invoice.paymentMethod] ?? invoice.paymentMethod}</strong>
-        </div>
+        <div class="totals-column">
+          <table class="totals-table">
+            <tr>
+              <td>Base imponible</td>
+              <td class="right font-mono font-semibold">${Number(invoice.subtotal).toFixed(2)} €</td>
+            </tr>
+            <tr>
+              <td>IVA (${invoice.taxRate}%)</td>
+              <td class="right font-mono font-semibold">${Number(invoice.taxAmount).toFixed(2)} €</td>
+            </tr>
+            <tr class="total-highlight">
+              <td style="border-radius: 6px 0 0 6px;">TOTAL FACTURA</td>
+              <td class="right font-mono" style="border-radius: 0 6px 6px 0;">${Number(invoice.total).toFixed(2)} €</td>
+            </tr>
+          </table>
 
-        <table class="totals-table">
-          <tr>
-            <td>Base imponible</td>
-            <td class="right font-mono font-semibold">${Number(invoice.subtotal).toFixed(2)} €</td>
-          </tr>
-          <tr>
-            <td>IVA (${invoice.taxRate}%)</td>
-            <td class="right font-mono font-semibold">${Number(invoice.taxAmount).toFixed(2)} €</td>
-          </tr>
-          <tr class="total-highlight">
-            <td style="border-radius: 6px 0 0 6px;">TOTAL FACTURA</td>
-            <td class="right font-mono" style="border-radius: 0 6px 6px 0;">${Number(invoice.total).toFixed(2)} €</td>
-          </tr>
-        </table>
+          <div class="payment-method-badge">
+            Forma de pago
+            <strong>${PAYMENT_METHOD_LABELS[invoice.paymentMethod] ?? invoice.paymentMethod}</strong>
+          </div>
+        </div>
       </div>
 
       <!-- Pie de página -->
