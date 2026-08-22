@@ -8,6 +8,7 @@ import FormLabel from "../components/ui/FormLabel";
 import TextInput from "../components/ui/TextInput";
 import Button from "../components/ui/Button";
 import Alert from "../components/ui/Alert";
+import Select from "../components/ui/Select";
 
 function ItemDetail() {
   const { id } = useParams();
@@ -16,6 +17,7 @@ function ItemDetail() {
   const [formData, setFormData] = useState({
     name: "",
     unitPrice: "",
+    billingUnit: "unit",
     inStock: false,
   });
   const [error, setError] = useState("");
@@ -33,6 +35,7 @@ function ItemDetail() {
           setFormData({
             name: data.item.name || "",
             unitPrice: data.item.unitPrice?.toString() || "",
+            billingUnit: data.item.billingUnit || "unit",
             inStock: Boolean(data.item.inStock),
           });
         }
@@ -154,6 +157,15 @@ function ItemDetail() {
                 €
               </span>
             </div>
+          </div>
+
+          <div>
+            <FormLabel htmlFor="billingUnit">Tipo de Facturación</FormLabel>
+            <Select id="billingUnit" name="billingUnit" value={formData.billingUnit} onChange={handleChange}>
+              <option value="unit">Por unidad</option>
+              <option value="hour">Por hora</option>
+              <option value="minute">Por minuto</option>
+            </Select>
           </div>
 
           {/* Switch / Checkbox de Disponibilidad en Stock */}

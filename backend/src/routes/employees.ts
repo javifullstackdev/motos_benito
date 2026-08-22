@@ -8,7 +8,7 @@ router.use(requireAuth);
 
 router.get("/", async (req, res) => {
   const employees = await prisma.employee.findMany({
-    select: { emplId: true, firstName: true, lastName1: true, lastName2: true },
+    select: { emplId: true, firstName: true, lastName1: true, lastName2: true, nationalId: true },
     where: { active: true },
     orderBy: { firstName: "asc" },
   });

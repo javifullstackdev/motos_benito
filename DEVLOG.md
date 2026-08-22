@@ -273,3 +273,14 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - Nueva plantilla de PDF (`buildQuarterlyReportHtml`) con el listado de facturas del periodo y los totales de base imponible, IVA repercutido y total facturado, con el mismo estilo visual que las facturas individuales.
 - **Alcance deliberadamente limitado**: el informe solo cubre el IVA repercutido (facturas emitidas) — la app no registra gastos ni compras del taller, así que no sustituye la preparación completa del Modelo 303, que también necesita el IVA soportado.
 - Añadida una tarjeta nueva en el Dashboard con selector de empleado/trimestre/año, resumen en pantalla y botón de descarga del PDF.
+
+
+## 2026-08-21 — Precio editable, mano de obra por tiempo, descuentos, forma de pago y trazabilidad de autoría
+
+- **Esquema**: nuevos campos `billingUnit` en `Item` (por unidad / hora / minuto), `discountPercent` en `InvoiceLine`, `paymentMethod` en `Invoice`, y `createdByEmplId` en `Invoice` (con dos relaciones nombradas hacia `Employee` — `InvoiceAttribution` e `InvoiceAuthor` — necesarias porque ahora hay dos vínculos distintos entre los mismos dos modelos). `quantity` en `InvoiceLine` pasa de `Int` a `Decimal` para soportar fracciones de hora (ej. 1.5h de mano de obra).
+- **Precio manual y descuentos**: el backend deja de forzar el precio del catálogo — acepta el `unitPrice` que mande el frontend por línea (validando que no sea negativo) y aplica el descuento por línea (`unitPrice × cantidad × (1 - descuento/100)`), útil para casos como regalar un artículo (100% de descuento) al vender otro.
+- **Empleado que emite sin re-loguear**: `InvoiceCreate.tsx` incorpora un selector de empleado independiente de la sesión iniciada, con el modal de confirmación por DNI (ya existente) ahora validado contra el empleado elegido en la factura, no contra el de la sesión — pasa a ser el verdadero mecanismo de autorización por factura.
+- **Trazabilidad de autoría**: para distinguir "a quién se atribuye la factura" (`emplId`, determina numeración/NIF/cadena de hash) de "quién la ha creado realmente" (`createdByEmplId`), se añadió este segundo campo, tomado siempre de `req.session.emplId` en el servidor — nunca del cuerpo de la petición, para que no se pueda falsear. `InvoiceList.tsx` muestra un aviso "Registrada por..." solo cuando ambos empleados no coinciden, para no ensuciar el caso normal.
+- **Branding**: favicon, título de pestaña y metaetiquetas Open Graph (vista previa al compartir el enlace por WhatsApp) actualizados en `index.html`.
+
+**Pendiente**: el desplegable de empleados del informe trimestral de IVA (Dashboard) no carga datos en producción, aunque en local sí — por depurar, parece un problema aislado de esa ruta concreta en el despliegue.

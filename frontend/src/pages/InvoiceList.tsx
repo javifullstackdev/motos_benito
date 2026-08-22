@@ -10,6 +10,7 @@ type Invoice = {
   customer: { customerId: number; name: string };
   workshop: { workshopId: number; name: string };
   employee: { emplId: number; firstName: string; lastName1: string };
+  createdBy: { emplId: number; firstName: string; lastName1: string };
 };
 
 function InvoiceList() {
@@ -124,6 +125,16 @@ function InvoiceList() {
                 </span>
               </div>
 
+              {/* Si el emisor no es el mismo que el mecánico, mostrar el nombre del emisor */}
+              {invoice.createdBy.emplId !== invoice.employee.emplId && (
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-neutral-500">Registrada por:</span>
+                  <span className="text-orange-400 truncate max-w-[210px]">
+                    {invoice.createdBy.firstName} {invoice.createdBy.lastName1}
+                  </span>
+                </div>
+              )}
+
               <div className="flex items-center justify-between text-[11px]">
                 <span className="text-neutral-500">Mecánico resp.:</span>
                 <span className="text-neutral-400 truncate max-w-[210px]">
@@ -191,6 +202,11 @@ function InvoiceList() {
                     <span className="text-base text-neutral-500">
                       Resp: {invoice.employee.firstName} {invoice.employee.lastName1}
                     </span>
+                    {invoice.createdBy.emplId !== invoice.employee.emplId && (
+                      <span className="block text-base text-orange-400">
+                        Registrada por: {invoice.createdBy.firstName} {invoice.createdBy.lastName1}
+                      </span>
+                    )}
                   </td>
 
                   <td className="px-5 py-4 font-mono text-base text-neutral-400">

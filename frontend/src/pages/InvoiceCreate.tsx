@@ -24,20 +24,36 @@ type Item = {
   itemId: number;
   name: string;
   unitPrice: number;
+  billingUnit: string;
+};
+
+type EmployeeOption = {
+  emplId: number;
+  firstName: string;
+  lastName1: string;
+  lastName2: string;
+  nationalId: string;
 };
 
 type LineInput = {
   itemSearch: string;
-  quantity: number;
+  quantity: string;
+  unitPrice: string;
+  discountPercent: string;
 };
+
+const EMPTY_LINE: LineInput = { itemSearch: "", quantity: "1", unitPrice: "", discountPercent: "0" };
 
 function InvoiceCreate() {
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [items, setItems] = useState<Item[]>([]);
+  const [employees, setEmployees] = useState<EmployeeOption[]>([]);
   const [workshopId, setWorkshopId] = useState("");
   const [customerSearch, setCustomerSearch] = useState("");
-  const [lines, setLines] = useState<LineInput[]>([{ itemSearch: "", quantity: 1 }]);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("efectivo");
+  const [lines, setLines] = useState<LineInput[]>([EMPTY_LINE]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [createdInvoice, setCreatedInvoice] = useState<{
@@ -46,7 +62,8 @@ function InvoiceCreate() {
   } | null>(null);
 
   const selectedCustomer = customers.find((customer) => customer.name === customerSearch);
-  const { employee } = useAuth();
+  const selectedEmployee = employees.find((emp) => String(emp.emplId) === selectedEmployeeId);
+  const { employee: loggedInEmployee } = useAuth();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   useEffect(() => {
@@ -59,31 +76,64 @@ function InvoiceCreate() {
     apiFetch("/api/items")
       .then((data) => setItems(data.items))
       .catch(() => setItems([]));
+    apiFetch("/api/employees")
+      .then((data) => setEmployees(data.employees))
+      .catch(() => setEmployees([]));
   }, []);
 
-  function updateLine(index: number, field: keyof LineInput, value: string | number) {
+  useEffect(() => {
+    if (loggedInEmployee) {
+      setSelectedEmployeeId(String(loggedInEmployee.emplId));
+    }
+  }, [loggedInEmployee]);
+
+  function updateLine(index: number, field: keyof LineInput, value: string) {
     setLines((prev) =>
       prev.map((line, i) => (i === index ? { ...line, [field]: value } : line))
     );
   }
 
+  function handleItemSearchChange(index: number, value: string) {
+    const matchedItem = items.find((item) => item.name === value);
+    setLines((prev) =>
+      prev.map((line, i) =>
+        i === index
+          ? {
+              ...line,
+              itemSearch: value,
+              unitPrice: matchedItem ? String(matchedItem.unitPrice) : line.unitPrice,
+            }
+          : line
+      )
+    );
+  }
+
   function addLine() {
-    setLines((prev) => [...prev, { itemSearch: "", quantity: 1 }]);
+    setLines((prev) => [...prev, EMPTY_LINE]);
   }
 
   function removeLine(index: number) {
     setLines((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function lineSubtotal(line: LineInput) {
+    const unitPrice = Number(line.unitPrice) || 0;
+    const quantity = Number(line.quantity) || 0;
+    const discountPercent = Number(line.discountPercent) || 0;
+    return unitPrice * quantity * (1 - discountPercent / 100);
+  }
+
   // Cálculo en tiempo real del subtotal total provisional
-  const invoiceSubtotal = lines.reduce((acc, line) => {
-    const item = items.find((i) => i.name === line.itemSearch);
-    return acc + (item ? item.unitPrice * (line.quantity || 0) : 0);
-  }, 0);
+  const invoiceSubtotal = lines.reduce((acc, line) => acc + lineSubtotal(line), 0);
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError("");
+
+    if (!selectedEmployeeId) {
+      setError("Selecciona el empleado que emite la factura");
+      return;
+    }
 
     if (!workshopId) {
       setError("Selecciona el taller emisor");
@@ -97,11 +147,16 @@ function InvoiceCreate() {
 
     const resolvedLines = lines.map((line) => {
       const item = items.find((i) => i.name === line.itemSearch);
-      return { itemId: item?.itemId, quantity: line.quantity };
+      return {
+        itemId: item?.itemId,
+        quantity: line.quantity,
+        unitPrice: line.unitPrice,
+        discountPercent: line.discountPercent,
+      };
     });
 
-    if (resolvedLines.some((line) => !line.itemId)) {
-      setError("Todas las líneas deben contener un artículo/servicio válido de la base de datos");
+    if (resolvedLines.some((line) => !line.itemId || !line.unitPrice || Number(line.unitPrice) < 0)) {
+      setError("Todas las líneas deben tener un artículo válido y un precio unitario correcto");
       return;
     }
 
@@ -115,7 +170,12 @@ function InvoiceCreate() {
 
     const resolvedLines = lines.map((line) => {
       const item = items.find((i) => i.name === line.itemSearch);
-      return { itemId: item?.itemId, quantity: line.quantity };
+      return {
+        itemId: item?.itemId,
+        quantity: line.quantity,
+        unitPrice: line.unitPrice,
+        discountPercent: line.discountPercent,
+      };
     });
 
     setIsLoading(true);
@@ -124,8 +184,10 @@ function InvoiceCreate() {
       const data = await apiFetch("/api/invoices", {
         method: "POST",
         body: JSON.stringify({
+          emplId: Number(selectedEmployeeId),
           workshopId: Number(workshopId),
           customerId: selectedCustomer.customerId,
+          paymentMethod,
           lines: resolvedLines,
         }),
       });
@@ -190,7 +252,7 @@ function InvoiceCreate() {
               onClick={() => {
                 setCreatedInvoice(null);
                 setCustomerSearch("");
-                setLines([{ itemSearch: "", quantity: 1 }]);
+                setLines([EMPTY_LINE]);
               }}
             >
               Emitir otra factura
@@ -211,7 +273,7 @@ function InvoiceCreate() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
-            {/* SECCIÓN 1: DATOS CABECERA (TALLER Y CLIENTE) */}
+            {/* SECCIÓN 1: DATOS CABECERA */}
             <div>
               <h2 className="text-base font-bold uppercase tracking-wider text-orange-500 mb-4 flex items-center gap-2">
                 <span>01</span>
@@ -219,6 +281,22 @@ function InvoiceCreate() {
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <FormLabel>Empleado que Emite *</FormLabel>
+                  <Select
+                    value={selectedEmployeeId}
+                    onChange={(e) => setSelectedEmployeeId(e.target.value)}
+                    required
+                  >
+                    <option value="">Selecciona...</option>
+                    {employees.map((emp) => (
+                      <option key={emp.emplId} value={emp.emplId}>
+                        {emp.firstName} {emp.lastName1}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
                 <div>
                   <FormLabel>Taller Emisor *</FormLabel>
                   <Select
@@ -252,6 +330,18 @@ function InvoiceCreate() {
                     </datalist>
                   </div>
                 </div>
+
+                <div>
+                  <FormLabel>Forma de Pago *</FormLabel>
+                  <Select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    required
+                  >
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta">Tarjeta</option>
+                  </Select>
+                </div>
               </div>
             </div>
 
@@ -276,56 +366,88 @@ function InvoiceCreate() {
               <div className="space-y-3">
                 {lines.map((line, index) => {
                   const selectedItem = items.find((item) => item.name === line.itemSearch);
-                  const subtotal = selectedItem ? selectedItem.unitPrice * (line.quantity || 0) : 0;
+                  const quantityUnitLabel =
+                    selectedItem?.billingUnit === "hour"
+                      ? "horas"
+                      : selectedItem?.billingUnit === "minute"
+                      ? "minutos"
+                      : "uds.";
 
                   return (
                     <div
                       key={index}
-                      className="flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-xl border border-neutral-800/80 bg-neutral-950/60 p-3.5 transition-colors hover:border-neutral-700"
+                      className="rounded-xl border border-neutral-800/80 bg-neutral-950/60 p-3.5 transition-colors hover:border-neutral-700"
                     >
-                      {/* Buscador de artículo con datalist */}
-                      <div className="flex-1 w-full">
-                        <TextInput
-                          list="item-options"
-                          value={line.itemSearch}
-                          onChange={(e) => updateLine(index, "itemSearch", e.target.value)}
-                          placeholder="Buscar producto o servicio..."
-                        />
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="flex-1 w-full">
+                          <TextInput
+                            list="item-options"
+                            value={line.itemSearch}
+                            onChange={(e) => handleItemSearchChange(index, e.target.value)}
+                            placeholder="Buscar producto o servicio..."
+                          />
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => removeLine(index)}
+                          disabled={lines.length === 1}
+                          aria-label="Quitar línea"
+                          className="rounded-lg p-2 text-neutral-500 hover:bg-red-950/40 hover:text-red-400 transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-neutral-500"
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
                       </div>
 
-                      {/* Cantidad */}
-                      <div className="w-24 flex-shrink-0">
-                        <TextInput
-                          type="number"
-                          value={line.quantity}
-                          onChange={(e) => updateLine(index, "quantity", Number(e.target.value))}
-                          min={1}
-                          className="text-center font-mono"
-                        />
-                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
+                        <div>
+                          <label className="block text-sm text-neutral-500 mb-1">
+                            Cantidad ({quantityUnitLabel})
+                          </label>
+                          <TextInput
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            value={line.quantity}
+                            onChange={(e) => updateLine(index, "quantity", e.target.value)}
+                            className="text-center font-mono"
+                          />
+                        </div>
 
-                      {/* Precio Unitario / Subtotal dinámico */}
-                      <div className="w-32 flex-shrink-0 text-right font-mono">
-                        <span className="text-base font-bold text-orange-500 block">
-                          {subtotal.toFixed(2)} €
-                        </span>
-                        <span className="text-sm text-neutral-500 block">
-                          {selectedItem ? `${Number(selectedItem.unitPrice).toFixed(2)} €/u` : "—"}
-                        </span>
-                      </div>
+                        <div>
+                          <label className="block text-sm text-neutral-500 mb-1">Precio unit. €</label>
+                          <TextInput
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={line.unitPrice}
+                            onChange={(e) => updateLine(index, "unitPrice", e.target.value)}
+                            className="text-center font-mono"
+                          />
+                        </div>
 
-                      {/* Botón Eliminar fila */}
-                      <button
-                        type="button"
-                        onClick={() => removeLine(index)}
-                        disabled={lines.length === 1}
-                        aria-label="Quitar línea"
-                        className="rounded-lg p-2 text-neutral-500 hover:bg-red-950/40 hover:text-red-400 transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-neutral-500"
-                      >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                        <div>
+                          <label className="block text-sm text-neutral-500 mb-1">Descuento %</label>
+                          <TextInput
+                            type="number"
+                            step="1"
+                            min="0"
+                            max="100"
+                            value={line.discountPercent}
+                            onChange={(e) => updateLine(index, "discountPercent", e.target.value)}
+                            className="text-center font-mono"
+                          />
+                        </div>
+
+                        <div className="text-right font-mono">
+                          <span className="block text-sm text-neutral-500 mb-1">Subtotal</span>
+                          <span className="text-base font-bold text-orange-500">
+                            {lineSubtotal(line).toFixed(2)} €
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
@@ -376,7 +498,7 @@ function InvoiceCreate() {
         title="Confirmar emisión de factura"
         message={`¿Estás seguro de que deseas generar la factura para "${selectedCustomer?.name}"? No podrás deshacer esta acción.`}
         inputLabel="Escribe tu DNI para confirmar"
-        expectedValue={employee?.nationalId ?? ""}
+        expectedValue={selectedEmployee?.nationalId ?? ""}
         confirmLabel="Generar factura"
         isLoading={isLoading}
         onConfirm={handleConfirmedCreate}

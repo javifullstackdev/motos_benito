@@ -60,7 +60,9 @@ async function createInvoiceWithRetry(
     employee: any,
     workshopId: number,
     customerId: number,
-    lines: { itemId: number; description: string; unitPrice: Prisma.Decimal; quantity: number }[],
+    paymentMethod: string,
+    createdByEmplId: number,
+    lines: { itemId: number; description: string; unitPrice: Prisma.Decimal; quantity: Prisma.Decimal; discountPercent: Prisma.Decimal }[],
     maxAttempts = 5
 ) {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -91,7 +93,9 @@ async function createInvoiceWithRetry(
 
                     const lineSubtotals = lines.map((line) => ({
                         ...line,
-                        lineSubtotal: line.unitPrice.mul(line.quantity),
+                        lineSubtotal: line.unitPrice
+                            .mul(line.quantity)
+                            .mul(new Prisma.Decimal(1).minus(line.discountPercent.div(100))),
                       }));
                       
                     const total = lineSubtotals.reduce(
@@ -119,12 +123,15 @@ async function createInvoiceWithRetry(
                             currentHash,
                             previousHash,
                             status: "issued",
+                            paymentMethod,
+                            createdByEmplId,
                             invoiceLines: {
                                 create: lineSubtotals.map((line) => ({
                                     itemId: line.itemId,
                                     description: line.description,
                                     unitPrice: line.unitPrice,
                                     quantity: line.quantity,
+                                    discountPercent: line.discountPercent,
                                     lineSubtotal: line.lineSubtotal,
                                 })),
                             }
@@ -148,29 +155,56 @@ async function createInvoiceWithRetry(
 }
 
 router.post("/", async (req, res) => {
-    const emplId = req.session.emplId!;
+    const { emplId, workshopId, customerId, paymentMethod, lines } = req.body;
+    const createdByEmplId = req.session.emplId!;
+
     const employee = await prisma.employee.findUnique({
-        where: { emplId }
+        where: { emplId: Number(emplId) },
     });
 
-    const { workshopId, customerId, lines } = req.body;
+    if (!employee || !employee.active) {
+        return res.status(400).json({ error: "Empleado no válido" });
+    }
 
-    const itemsIds = lines.map((line : any) => line.itemId);
+    if (!["efectivo", "tarjeta"].includes(paymentMethod)) {
+        return res.status(400).json({ error: "Forma de pago inválida" });
+    }
+
+    const itemsIds = lines.map((line: any) => line.itemId);
     const items = await prisma.item.findMany({
         where: { itemId: { in: itemsIds } },
     });
 
-    const resolvedLines = lines.map((line : any) => {
+    const resolvedLines = lines.map((line: any) => {
         const item = items.find((i) => i.itemId === line.itemId);
         return {
             itemId: line.itemId,
             description: item!.name,
-            unitPrice: item!.unitPrice,
-            quantity: line.quantity,
+            unitPrice: new Prisma.Decimal(line.unitPrice),
+            quantity: new Prisma.Decimal(line.quantity),
+            discountPercent: new Prisma.Decimal(line.discountPercent ?? 0),
         };
     });
 
-    const invoice = await createInvoiceWithRetry(employee, workshopId, customerId, resolvedLines);
+    const hasInvalidLine = resolvedLines.some(
+        (line: any) =>
+            line.unitPrice.isNegative() ||
+            line.discountPercent.lessThan(0) ||
+            line.discountPercent.greaterThan(100)
+    );
+
+    if (hasInvalidLine) {
+        return res.status(400).json({ error: "Precio o descuento inválido en alguna línea" });
+    }
+
+    const invoice = await createInvoiceWithRetry(
+        employee,
+        Number(workshopId),
+        Number(customerId),
+        paymentMethod,
+        createdByEmplId,
+        resolvedLines
+    );
 
     res.status(201).json({ invoice });
 });
@@ -274,6 +308,9 @@ router.get("/", async (req, res) => {
           select: { workshopId: true, name: true },
         },
         employee: {
+          select: { emplId: true, firstName: true, lastName1: true },
+        },
+        createdBy: {
           select: { emplId: true, firstName: true, lastName1: true },
         },
       },

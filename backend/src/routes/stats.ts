@@ -31,7 +31,7 @@ router.get("/top-items", async (req, res) => {
     return {
       itemId: entry.itemId,
       name: item?.name,
-      totalSold: entry._sum.quantity,
+      totalSold: Number(entry._sum.quantity),
     };
   });
 

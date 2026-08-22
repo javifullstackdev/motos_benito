@@ -45,7 +45,8 @@ model Employee {
   postalCode  String  @map("postal_code")
   country String
   active Boolean
-  invoices Invoice[]
+  invoices Invoice[] @relation("InvoiceAttribution")
+  createdInvoices Invoice[] @relation("InvoiceAuthor")
 
   @@map("employees")
 }
@@ -73,6 +74,7 @@ model Item {
   itemId Int @id @default(autoincrement())  @map("item_id")
   name String @unique
   unitPrice Decimal @db.Decimal(10,2) @map("unit_price")
+  billingUnit String @default("unit") @map("billing_unit")
   inStock  Boolean  @map("in_stock")
   invoiceLines InvoiceLine[]
 
@@ -84,6 +86,7 @@ model Invoice {
   invoiceNumber String @unique @map("invoice_number")
   workshopId Int  @map("workshop_id")
   emplId Int  @map("empl_id")
+  createdByEmplId Int @map("created_by_empl_id")
   customerId  Int  @map("customer_id")
   issueDate DateTime  @default(now()) @map("issue_date")
   subtotal  Decimal @db.Decimal(10,2)
@@ -93,9 +96,11 @@ model Invoice {
   currentHash String @unique @map("current_hash")
   previousHash String @map("previous_hash")
   status  String
+  paymentMethod String @map("payment_method")
   correctedInvoiceId  Int?  @map("corrected_invoice_id")
   workshop Workshop @relation(fields: [workshopId], references: [workshopId])
-  employee Employee @relation(fields: [emplId], references: [emplId])
+  employee Employee @relation("InvoiceAttribution", fields: [emplId], references: [emplId])
+  createdBy Employee @relation("InvoiceAuthor", fields: [createdByEmplId], references: [emplId])
   customer Customer @relation(fields: [customerId], references: [customerId])
   invoiceLines InvoiceLine[]
 
@@ -107,8 +112,9 @@ model InvoiceLine {
   invoiceId Int  @map("invoice_id")
   itemId Int  @map("item_id")
   description String
-  quantity  Int
+  quantity  Decimal @db.Decimal(10,2)
   unitPrice Decimal @db.Decimal(10,2)  @map("unit_price")
+  discountPercent Decimal @default(0) @db.Decimal(5,2) @map("discount_percent")
   lineSubtotal  Decimal @db.Decimal(10,2)  @map("line_subtotal")
   invoice Invoice @relation(fields: [invoiceId], references: [invoiceId])
   item Item @relation(fields: [itemId], references: [itemId])
