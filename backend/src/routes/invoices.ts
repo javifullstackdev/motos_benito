@@ -292,7 +292,9 @@ router.get("/:id/pdf", async (req, res) => {
         return res.status(404).json({ error: "Invoice not found" });
     }
 
-    const workshops = await prisma.workshop.findMany();
+    const workshops = await prisma.workshop.findMany({
+        orderBy: { name: "asc" },
+    });
 
     const qrDataUrl = await generateInvoiceQr(invoice);
     const html = buildInvoiceHtml(invoice, qrDataUrl, workshops);
