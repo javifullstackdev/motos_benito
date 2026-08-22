@@ -297,3 +297,9 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
   - Las líneas con descuento muestran una etiqueta junto a la descripción (ej. `-100%`).
   - Nueva insignia de "Forma de pago" junto al resumen de totales.
   - Junto al logo, listado de los dos talleres (dirección y teléfono) a modo de aviso comercial, para que el cliente sepa que existen ambas ubicaciones.
+
+  
+## 2026-08-22 — Ajuste de maquetación: talleres junto al logo
+
+- El bloque de "Nuestros talleres" en el PDF de factura pasa de estar apilado debajo del logo a colocarse al lado, separado por una línea divisoria vertical y con su propio encabezado — un aspecto más parecido a una tarjeta de marca profesional.
+- Corregido un despiste al aplicar el cambio anterior: el HTML del bloque de talleres se había pegado dentro de `buildQuarterlyReportHtml` (el informe trimestral) en vez de `buildInvoiceHtml` (la factura), rompiendo la compilación al referenciar variables fuera de su ámbito.

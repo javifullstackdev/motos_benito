@@ -129,22 +129,42 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string, workshops: any
 
       .logo-column {
         display: flex;
-        flex-direction: column;
-        gap: 10px;
-        max-width: 380px;
+        flex-direction: row;
+        align-items: center;
+        gap: 18px;
+        max-width: 480px;
       }
 
       .logo-container svg {
-        height: 90px;
+        height: 70px;
         width: auto;
-        max-width: 300px;
+        max-width: 200px;
         display: block;
+      }
+
+      .workshops-divider {
+        width: 1px;
+        align-self: stretch;
+        background-color: #e2e8f0;
+      }
+
+      .workshops-heading {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: #ea580c;
+        margin-bottom: 4px;
       }
 
       .workshops-list {
         font-size: 9px;
         color: #64748b;
         line-height: 1.5;
+      }
+
+      .workshops-list .workshop-entry {
+        margin-bottom: 2px;
       }
 
       .workshops-list .workshop-entry strong {
@@ -390,10 +410,12 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string, workshops: any
       <div class="top-stripe"></div>
 
       <!-- Cabecera -->
-      <div class="header">
+            <div class="header">
         <div class="logo-column">
           <div class="logo-container">${logoSvg}</div>
+          <div class="workshops-divider"></div>
           <div class="workshops-list">
+            <div class="workshops-heading">Nuestros talleres</div>
             ${workshopsHtml}
           </div>
         </div>
