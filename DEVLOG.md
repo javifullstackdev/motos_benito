@@ -284,3 +284,16 @@ Este archivo documenta cronológicamente las decisiones tomadas y los pasos dado
 - **Branding**: favicon, título de pestaña y metaetiquetas Open Graph (vista previa al compartir el enlace por WhatsApp) actualizados en `index.html`.
 
 **Pendiente**: el desplegable de empleados del informe trimestral de IVA (Dashboard) no carga datos en producción, aunque en local sí — por depurar, parece un problema aislado de esa ruta concreta en el despliegue.
+
+
+## 2026-08-22 — Corrección de migraciones en producción y mejoras en el PDF de factura
+
+- **Incidente de migraciones**: dos de las migraciones nuevas (`payment_method` y `created_by_empl_id` en `Invoice`) se generaron con la base de datos local recién reseteada (vacía), así que Prisma las creó como columnas `NOT NULL` sin ningún relleno para las filas existentes — funcionaron en local, pero fallaron al aplicarlas en producción (que sí tenía facturas reales), dejando la migración a medio aplicar. Corregido añadiendo un `UPDATE` de relleno antes de exigir `NOT NULL` en ambos archivos de migración, y resuelto el estado de producción con `prisma migrate resolve` + `prisma db execute`, ejecutados manualmente desde la Console del servicio de backend en Railway (es el único sitio desde el que se puede alcanzar la red interna de Postgres).
+- **Lección aprendida**: cualquier columna nueva `NOT NULL` sin `@default` es peligrosa si la tabla ya tiene filas en producción — o se le pone un valor por defecto en el propio esquema, o la migración necesita un `UPDATE` de relleno antes del `NOT NULL`. Ya aplicado de forma preventiva en el siguiente cambio.
+- **Snapshot de tipo de facturación por línea**: nuevo campo `billingUnit` en `InvoiceLine` (con `@default("unit")`, esta vez sin sobresaltos), para que una factura ya emitida no cambie de significado si el tipo de facturación del artículo del catálogo se modifica después.
+- **Mejoras en el PDF de factura**:
+  - El emisor ahora muestra el nombre del mecánico/autónomo (ej. "Fernando Moral Vega") como titular, con el taller como dato de dirección — antes aparecía el nombre del taller como titular, lo cual no reflejaba correctamente quién es el emisor fiscal real.
+  - Las líneas de mano de obra por tiempo muestran cantidad y precio con su unidad (`1.5 h`, `10.00 €/h`) en vez de números sueltos sin contexto.
+  - Las líneas con descuento muestran una etiqueta junto a la descripción (ej. `-100%`).
+  - Nueva insignia de "Forma de pago" junto al resumen de totales.
+  - Junto al logo, listado de los dos talleres (dirección y teléfono) a modo de aviso comercial, para que el cliente sepa que existen ambas ubicaciones.

@@ -27,7 +27,24 @@ export async function generatePdf(html: string): Promise<Uint8Array> {
   return pdfBuffer;
 }
 
-export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
+function formatQuantityWithUnit(quantity: number, billingUnit: string): string {
+  if (billingUnit === "hour") return `${quantity} h`;
+  if (billingUnit === "minute") return `${quantity} min`;
+  return `${quantity}`;
+}
+
+function formatUnitPriceWithUnit(unitPrice: number, billingUnit: string): string {
+  if (billingUnit === "hour") return `${unitPrice.toFixed(2)} €/h`;
+  if (billingUnit === "minute") return `${unitPrice.toFixed(2)} €/min`;
+  return `${unitPrice.toFixed(2)} €/u`;
+}
+
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+  efectivo: "Efectivo",
+  tarjeta: "Tarjeta",
+};
+
+export function buildInvoiceHtml(invoice: any, qrDataUrl: string, workshops: any[]): string {
   const formattedDate = new Date(invoice.issueDate).toLocaleDateString(
     "es-ES",
     {
@@ -38,14 +55,28 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
   );
 
   const rowsHtml = invoice.invoiceLines
-    .map(
-      (line: any) => `
+    .map((line: any) => {
+      const discountPercent = Number(line.discountPercent);
+      return `
         <tr>
-          <td class="desc-cell">${line.description}</td>
-          <td class="right font-mono">${line.quantity}</td>
-          <td class="right font-mono">${Number(line.unitPrice).toFixed(2)} €</td>
+          <td class="desc-cell">
+            ${line.description}
+            ${discountPercent > 0 ? `<span class="discount-tag">-${discountPercent}%</span>` : ""}
+          </td>
+          <td class="right font-mono">${formatQuantityWithUnit(Number(line.quantity), line.billingUnit)}</td>
+          <td class="right font-mono">${formatUnitPriceWithUnit(Number(line.unitPrice), line.billingUnit)}</td>
           <td class="right font-mono font-semibold">${Number(line.lineSubtotal).toFixed(2)} €</td>
         </tr>
+      `;
+    })
+    .join("");
+
+  const workshopsHtml = workshops
+    .map(
+      (w: any) => `
+        <div class="workshop-entry">
+          <strong>${w.name}</strong> — ${w.streetType} ${w.streetName} ${w.streetNumber}, ${w.city} · ${w.phone}
+        </div>
       `
     )
     .join("");
@@ -78,7 +109,6 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
         font-family: 'JetBrains Mono', monospace;
       }
 
-      /* Barra de acento superior */
       .top-stripe {
         position: absolute;
         top: 0;
@@ -88,28 +118,37 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
         background: linear-gradient(90deg, #ea580c 0%, #f97316 100%);
       }
 
-      /* Header */
       .header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
         margin-bottom: 32px;
         padding-bottom: 24px;
         border-bottom: 1px solid #e2e8f0;
       }
 
-      .logo-container {
+      .logo-column {
         display: flex;
-        align-items: center;
-        max-width: 360px;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 380px;
       }
 
-      /* Logo ampliado con escala visual destacada */
       .logo-container svg {
-        height: 110px;
+        height: 90px;
         width: auto;
-        max-width: 340px;
+        max-width: 300px;
         display: block;
+      }
+
+      .workshops-list {
+        font-size: 9px;
+        color: #64748b;
+        line-height: 1.5;
+      }
+
+      .workshops-list .workshop-entry strong {
+        color: #0f172a;
       }
 
       .invoice-title {
@@ -139,7 +178,6 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
         color: #0f172a;
       }
 
-      /* Emisor y Receptor */
       .parties {
         display: flex;
         justify-content: space-between;
@@ -179,7 +217,6 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
         font-size: 11.5px;
       }
 
-      /* Tabla de Líneas */
       table.invoice-table {
         width: 100%;
         border-collapse: separate;
@@ -229,13 +266,41 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
         color: #0f172a;
       }
 
+      .discount-tag {
+        display: inline-block;
+        margin-left: 6px;
+        font-size: 9.5px;
+        font-weight: 700;
+        color: #16a34a;
+        background-color: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 4px;
+        padding: 1px 5px;
+      }
+
       table.invoice-table td.right { text-align: right; }
 
-      /* Bloque de Totales */
       .summary-section {
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
+        align-items: flex-start;
         margin-bottom: 32px;
+      }
+
+      .payment-method-badge {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 11px;
+        color: #475569;
+      }
+
+      .payment-method-badge strong {
+        display: block;
+        color: #0f172a;
+        font-size: 12.5px;
+        margin-top: 2px;
       }
 
       .totals-table {
@@ -270,7 +335,6 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
         font-size: 16px;
       }
 
-      /* Pie de Documento y QR */
       .footer {
         margin-top: auto;
         padding-top: 20px;
@@ -327,8 +391,11 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
 
       <!-- Cabecera -->
       <div class="header">
-        <div class="logo-container">
-          ${logoSvg}
+        <div class="logo-column">
+          <div class="logo-container">${logoSvg}</div>
+          <div class="workshops-list">
+            ${workshopsHtml}
+          </div>
         </div>
         <div class="invoice-title">
           <div class="invoice-badge">FACTURA</div>
@@ -341,14 +408,12 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
       <div class="parties">
         <div class="party-card">
           <h3>Emisor</h3>
-          <p class="name">${invoice.workshop.name}</p>
-          <p>NIF/CIF: <span class="font-mono">${invoice.employee.nationalId}</span></p>
+          <p class="name">${invoice.employee.firstName} ${invoice.employee.lastName1} ${invoice.employee.lastName2}</p>
+          <p>NIF: <span class="font-mono">${invoice.employee.nationalId}</span></p>
+          <p>Taller: ${invoice.workshop.name}</p>
           <p>${invoice.workshop.streetType} ${invoice.workshop.streetName} ${invoice.workshop.streetNumber}</p>
           <p>${invoice.workshop.postalCode} ${invoice.workshop.city}, ${invoice.workshop.province}</p>
           <p>${invoice.workshop.phone} · ${invoice.workshop.email}</p>
-          <p style="margin-top: 6px; font-size: 10.5px; color: #94a3b8;">
-            Mecánico responsable: ${invoice.employee.firstName} ${invoice.employee.lastName1}
-          </p>
         </div>
 
         <div class="party-card">
@@ -366,7 +431,7 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
         <thead>
           <tr>
             <th>Descripción del producto / servicio</th>
-            <th class="right" style="width: 70px;">Cant.</th>
+            <th class="right" style="width: 80px;">Cant.</th>
             <th class="right" style="width: 110px;">Precio Unit.</th>
             <th class="right" style="width: 110px;">Subtotal</th>
           </tr>
@@ -378,6 +443,11 @@ export function buildInvoiceHtml(invoice: any, qrDataUrl: string): string {
 
       <!-- Resumen de Importes -->
       <div class="summary-section">
+        <div class="payment-method-badge">
+          Forma de pago
+          <strong>${PAYMENT_METHOD_LABELS[invoice.paymentMethod] ?? invoice.paymentMethod}</strong>
+        </div>
+
         <table class="totals-table">
           <tr>
             <td>Base imponible</td>

@@ -62,7 +62,7 @@ async function createInvoiceWithRetry(
     customerId: number,
     paymentMethod: string,
     createdByEmplId: number,
-    lines: { itemId: number; description: string; unitPrice: Prisma.Decimal; quantity: Prisma.Decimal; discountPercent: Prisma.Decimal }[],
+    lines: { itemId: number; description: string; unitPrice: Prisma.Decimal; quantity: Prisma.Decimal; discountPercent: Prisma.Decimal; billingUnit: string }[],
     maxAttempts = 5
 ) {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -132,6 +132,7 @@ async function createInvoiceWithRetry(
                                     unitPrice: line.unitPrice,
                                     quantity: line.quantity,
                                     discountPercent: line.discountPercent,
+                                    billingUnit: line.billingUnit,
                                     lineSubtotal: line.lineSubtotal,
                                 })),
                             }
@@ -183,6 +184,7 @@ router.post("/", async (req, res) => {
             unitPrice: new Prisma.Decimal(line.unitPrice),
             quantity: new Prisma.Decimal(line.quantity),
             discountPercent: new Prisma.Decimal(line.discountPercent ?? 0),
+            billingUnit: item!.billingUnit,
         };
     });
 
@@ -290,8 +292,10 @@ router.get("/:id/pdf", async (req, res) => {
         return res.status(404).json({ error: "Invoice not found" });
     }
 
+    const workshops = await prisma.workshop.findMany();
+
     const qrDataUrl = await generateInvoiceQr(invoice);
-    const html = buildInvoiceHtml(invoice, qrDataUrl);
+    const html = buildInvoiceHtml(invoice, qrDataUrl, workshops);
     const pdfBuffer = await generatePdf(html);
 
     res.setHeader("Content-Type", "application/pdf");

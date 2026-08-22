@@ -114,6 +114,7 @@ model InvoiceLine {
   description String
   quantity  Decimal @db.Decimal(10,2)
   unitPrice Decimal @db.Decimal(10,2)  @map("unit_price")
+  billingUnit String @default("unit") @map("billing_unit")
   discountPercent Decimal @default(0) @db.Decimal(5,2) @map("discount_percent")
   lineSubtotal  Decimal @db.Decimal(10,2)  @map("line_subtotal")
   invoice Invoice @relation(fields: [invoiceId], references: [invoiceId])
